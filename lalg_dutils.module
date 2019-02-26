@@ -1,0 +1,100 @@
+<?php
+
+//************************************************************
+// Deals with Autocomplete of Pay Later for admin screens
+//************************************************************
+/**
+ * Implements hook_action_info()
+ * Creates an Action to Complete a Pay Later Contribution.
+ */
+function lalg_dutils_action_info() {
+	//dpm('Hook Action Info called');
+  return array(
+    'lalg_dutils_complete_pay_later_contribution' => array(
+      'type' => 'entity',
+      'label' => t('Complete payment for a Pending Contribution'),
+      'behavior' => array('changes_property'),
+      'configurable' => FALSE,
+      'vbo_configurable' => FALSE,
+      'triggers' => array('any'),
+    ),
+  );
+}
+
+/**
+ * Carries out the Complete Payment Action
+ */
+function lalg_dutils_complete_pay_later_contribution(&$entity, $context) {
+//	dpm('VBO Action');
+//	dpm($entity);
+//	dpm($context);
+	
+	if ($context['entity_type'] != 'civicrm_contribution' ) return;
+	if ($entity -> contribution_status != 'Pending' ) return;
+	$cid = $entity -> contribution_id;
+//	dpm($cid);
+
+// Call the API to trigger the dependent actions - update Membership and send email 
+//	dpm('VBO Completing the Contribution');
+	$result = civicrm_api3('Contribution', 'completetransaction', [
+		'id' => $cid,
+		'total_amount' => $entity -> total_amount,
+		'financial_type' => 2,									// Membership Dues
+	]);
+//	dpm($result);
+	
+// The system will now save the Drupal Entity which is mirroring the CiviCRM one, 
+//  and thus overwrite changes made via the API.
+//  So update the critical items 'by hand' before this happens.	
+	$contribution_entity = entity_load_single('civicrm_contribution', $cid);
+//	dpm($contribution_entity);
+	
+	$contribution_entity -> contribution_status_id = 1;				// Complete
+	$contribution_entity -> contribution_status = 'Complete';		// Belt and Braces
+	$contribution_entity -> payment_instrument_id = 6;				// Not Tracked
+	$contribution_entity -> instrument_id = 6;						// Belt and Braces	
+	$contribution_entity -> payment_instrument = 'Not Tracked';		// Belt and Braces
+//	entity_save('civicrm_contribution', $contribution_entity);
+}
+
+//********************************************************************
+// Custom Webform Validation Rules
+//********************************************************************
+
+/**
+ * Implements hook_webform_validation_validators().
+ */
+function lalg_dutils_webform_validation_validators() {
+  return array(
+    'all_or_none' => array(
+      'name' => "LALG All or None of Name/Email",
+      'description' => "Checks all or none of the fields have content",
+      'component_types' => array(
+        'textfield', 'email',
+      ),
+    )
+  );
+}
+
+/**
+ * Implements hook_webform_validation_validate().
+ */
+function lalg_dutils_webform_validation_validate($validator_name, $items, $components, $rule) {
+  if ($items) {
+    switch ($validator_name) {
+      case 'all_or_none':
+// dpm($items);	  
+        $errors = array();
+        foreach ($items as $key => $val) {
+			$items[$key] = (bool) strlen($items[$key]);
+        }
+		$number_completed = count(array_filter($items));
+		if ($number_completed > 0 && $number_completed < count($items) ) {
+			reset($items);
+			$errors[key($items)] = 'You must complete all or none of the First/Last Name and Email';
+		}
+        return $errors;
+        break;
+    }
+  }
+}
