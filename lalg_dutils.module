@@ -98,3 +98,21 @@ function lalg_dutils_webform_validation_validate($validator_name, $items, $compo
     }
   }
 }
+
+//********************************************************************
+// Adds Javascript to Webforms for behaviour tweaks.
+//********************************************************************
+
+/**
+ * Implements hook_form_alter().
+ */
+function lalg_dutils_form_alter(&$form, &$form_state, $form_id) {
+//dpm($form_id);
+
+  if (($form_id == 'webform_client_form_7015') || ($form_id == 'webform_client_form_7016')) {
+    $form['#attached']['js'][] = drupal_get_path('module', 'lalg_dutils') . '/lalg_webform.js';
+  }
+}
+
+
+
