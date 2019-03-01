@@ -64,7 +64,12 @@ if (targetNode) {
 		var mutation = mutationsList[0];
 		if(mutation.target.nodeName == 'UL' && mutation.removedNodes[0] && mutation.removedNodes[0].nodeName == 'LI') {
 			//console.log('contact deleted');
-			location.reload(true);
+			//Clear all fields, or set defaults
+			$('input').val('');
+			$('textarea').val('');
+			$("body.node-type-webform input#edit-submitted-membership-details-civicrm-2-contact-1-cg8-custom-18-2").click();
+			$("body.node-type-webform input#edit-submitted-membership-details-civicrm-2-contact-1-cg8-custom-19-1").click();
+			$('input[type=checkbox]').prop('checked',false);
 		}
 	};
 
