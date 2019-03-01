@@ -100,18 +100,54 @@ function lalg_dutils_webform_validation_validate($validator_name, $items, $compo
 }
 
 //********************************************************************
-// Adds Javascript to Webforms for behaviour tweaks.
+// Changes to Webforms - in addition to the standard configuration stuff
 //********************************************************************
-
 /**
  * Implements hook_form_alter().
  */
-function lalg_dutils_form_alter(&$form, &$form_state, $form_id) {
+function lalg_dutils_form_webform_client_form_7015_alter(&$form, &$form_state, $form_id) {
+	do_webform_alter($form, $form_state, $form_id);
+}
+function lalg_dutils_form_webform_client_form_7016_alter(&$form, &$form_state, $form_id) {
+	do_webform_alter($form, $form_state, $form_id);
+}
+
+function do_webform_alter(&$form, &$form_state, $form_id) {
 //dpm($form_id);
 
-  if (($form_id == 'webform_client_form_7015') || ($form_id == 'webform_client_form_7016')) {
+//************  Attach Javascript to Webforms for behaviour tweaks. ************
     $form['#attached']['js'][] = drupal_get_path('module', 'lalg_dutils') . '/lalg_webform.js';
-  }
+  
+//************  Add Membership Price Information  *****************
+	// Find the Price Details
+	$result = civicrm_api3('PriceSet', 'get', [
+		'sequential' => 1,
+		'name' => "Membership_Options_H",
+	]);
+
+	$result = civicrm_api3('PriceField', 'get', [
+		'sequential' => 1,
+		'price_set_id' => $result['values'][0]['id'],
+	]);
+
+	$result = civicrm_api3('PriceFieldValue', 'get', [
+	  'sequential' => 1,
+	  'price_field_id' => $result['values'][0]['id'],
+	]);
+//dpm($result);
+	$values = $result['values'];
+	foreach ($values as $key => $value) {
+		if (stripos($value['name'], 'plain') !== FALSE) $plainKey = $key;
+		if (stripos($value['name'], 'with_news') !== FALSE) $newsletterKey = $key;
+	}
+
+	// Add Prices to the Membership fieldset description field
+//	dpm($form);
+	$prices = 'Membership Prices: </br>' . $values[$plainKey]['label'] . ' -- £';
+	$prices .= number_format((float)$values[$plainKey]['amount'], 2); 
+	$prices .= '.&nbsp;&nbsp;&nbsp;&nbsp;' . $values[$newsletterKey]['label'] . ' -- £';
+	$prices .= number_format((float)$values[$newsletterKey]['amount'], 2);
+	$form['submitted']['membership_details']['#description'] .= $prices;
 }
 
 
