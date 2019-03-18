@@ -119,6 +119,7 @@ function do_webform_alter(&$form, &$form_state, $form_id) {
     $form['#attached']['js'][] = drupal_get_path('module', 'lalg_dutils') . '/lalg_webform.js';
   
 //************  Add Membership Price Information  *****************
+  if ($form['progressbar']['#page_num'] == '1') {	
 	// Find the Price Details
 	$result = civicrm_api3('PriceSet', 'get', [
 		'sequential' => 1,
@@ -142,12 +143,13 @@ function do_webform_alter(&$form, &$form_state, $form_id) {
 	}
 
 	// Add Prices to the Membership fieldset description field
-//	dpm($form);
+	//dpm($form);
 	$prices = 'Membership Prices: </br>' . $values[$plainKey]['label'] . ' -- £';
 	$prices .= number_format((float)$values[$plainKey]['amount'], 2); 
 	$prices .= '.&nbsp;&nbsp;&nbsp;&nbsp;' . $values[$newsletterKey]['label'] . ' -- £';
 	$prices .= number_format((float)$values[$newsletterKey]['amount'], 2);
 	$form['submitted']['membership_details']['#description'] .= $prices;
+  }
 }
 
 
