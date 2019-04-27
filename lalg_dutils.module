@@ -25,7 +25,7 @@ function lalg_dutils_action_info() {
  * Carries out the Complete Payment Action
  */
 function lalg_dutils_complete_pay_later_contribution(&$entity, $context) {
-//	dpm('VBO Action');
+	//dpm('VBO Action');
 //	dpm($entity);
 //	dpm($context);
 	
@@ -105,21 +105,15 @@ function lalg_dutils_webform_validation_validate($validator_name, $items, $compo
 /**
  * Implements hook_form_alter().
  */
-function lalg_dutils_form_webform_client_form_7015_alter(&$form, &$form_state, $form_id) {
-	do_webform_alter($form, $form_state, $form_id);
-}
-function lalg_dutils_form_webform_client_form_7016_alter(&$form, &$form_state, $form_id) {
-	do_webform_alter($form, $form_state, $form_id);
-}
-
-function do_webform_alter(&$form, &$form_state, $form_id) {
-//dpm($form_id);
+function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
 
 //************  Attach Javascript to Webforms for behaviour tweaks. ************
     $form['#attached']['js'][] = drupal_get_path('module', 'lalg_dutils') . '/lalg_webform.js';
   
 //************  Add Membership Price Information  *****************
   if ($form['progressbar']['#page_num'] == '1') {	
+  //dpm($form);
+  //dpm($form_state);
 	// Find the Price Details
 	$result = civicrm_api3('PriceSet', 'get', [
 		'sequential' => 1,
