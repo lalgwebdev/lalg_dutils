@@ -7,82 +7,6 @@
 $(document).ready(function(){
 //	console.log("Webform Loaded");
 	
-// // ***********************************************************************
-// // *************  Not required - Autocomplete removed and Existing Contact field hidden
-// // Detect which browser we are using.  Needed below.
-// //	Taken from https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser/9851769 
-// // Opera 8.0+
-// var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
-
-// // Firefox 1.0+
-// var isFirefox = typeof InstallTrigger !== 'undefined';
-
-// // Safari 3.0+ "[object HTMLElementConstructor]" 
-// var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
-
-// // Internet Explorer 6-11
-// var isIE = /*@cc_on!@*/false || !!document.documentMode;
-
-// // Edge 20+
-// var isEdge = !isIE && !!window.StyleMedia;
-
-// // Chrome 1 - 71
-// var isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
-
-// // Blink engine detection
-// var isBlink = (isChrome || isOpera) && !!window.CSS;
-	
-// //*******************************************************************
-// // *************  Not required - Autocomplete removed and Existing Contact field hidden
-// //  Disable Autocomplete/Autofill on all input
-// //  On selecting Existing Contact on Admin Details Webform the browser drop-down interferes with the AJAX autocomplete code. 
-// //  On filling fields the browser can fill other, unwanted, fields, thus corrupting existing data.
-
-	// if(isChrome) {
-		// //  If Chrome have to put an invalid value in for Autocomplete attribute - Chrome ignores "off"
-		// $('body.node-type-webform input').attr('autocomplete', 'false123');
-	// } else if (isIE || isEdge) {
-		// // Display warning on IE & Edge.  Can't turn off Autofill on these.
-		// $('.webform-component--warning').css("display", "block");
-	// } else {
-		// $('body.node-type-webform input').attr('autocomplete', 'off');
-	// }
-
-// //*******************************************************************
-// // *************  Not required - Autocomplete removed and Existing Contact field hidden
-// //  Admin Webform only.  Force page reload when Existing Contact deleted - otherwise the page not cleared properly
-// //	Use Mutation Observer to detect when the <li> element containing the displayed name is destroyed
-	
-// // Select the node that will be observed for mutations
-// var targetNode = document.getElementsByClassName("webform-component-civicrm-contact webform-component--civicrm-1-contact-1-fieldset-fieldset--civicrm-1-contact-1-contact-existing")[0]; 
-// //console.log(targetNode);
-
-// // Only apply if on the first page with the Existing Contact Field.
-// if (targetNode) {
-	// // Options for the observer (which mutations to observe)
-	// var config = { attributes: false, childList: true, subtree: true };
-
-	// // Callback function to execute when mutations are observed
-	// var callback = function(mutationsList, observer) {
-		// var mutation = mutationsList[0];
-		// if(mutation.target.nodeName == 'UL' && mutation.removedNodes[0] && mutation.removedNodes[0].nodeName == 'LI') {
-			// //console.log('contact deleted');
-			// //Clear all fields, or set defaults
-			// $('input').val('');
-			// $('textarea').val('');
-			// $("body.node-type-webform input#edit-submitted-membership-details-civicrm-2-contact-1-cg8-custom-18-2").click();
-			// $("body.node-type-webform input#edit-submitted-membership-details-civicrm-2-contact-1-cg8-custom-19-1").click();
-			// $('input[type=checkbox]').prop('checked',false);
-		// }
-	// };
-
-	// // Create an observer instance linked to the callback function
-	// var observer = new MutationObserver(callback);
-
-	// // Start observing the target node for configured mutations
-	// observer.observe(targetNode, config);
-// }
-	
 //*******************************************************************	
 //  Open Additional Household Member filesets on Webforms if they have content.
 
@@ -106,14 +30,6 @@ $(document).ready(function(){
 			$(this).parent().parent().removeClass("collapsed");
 		};	
 	});
-
-// // *************  Not required - Autocomplete removed and Existing Contact field hidden
-// //  On Change, after page load, when form filled via AJAX (Admin Form only)
-	// $("input.lalg-wf-fs-additional-member").change(function(){
-// // console.log("The text has been changed.");
-	  // $(this).parent().parent().css("display", "block");
-	  // $(this).parent().parent().parent().removeClass("collapsed");
-	// });
 	
 //***************************************************************
 // Default Printed Card Required Flag when Membership Type changed
@@ -137,6 +53,21 @@ $(document).ready(function(){
 	$("input.lalg-wf-postcode").blur(function(){
 //	   console.log('Postcode blur');
 	  $(this).val( $(this).val().toUpperCase() );
+	});
+	
+//****************************************************************
+// Copy Postcode into clone fields on Contact
+	$(".form-actions input.webform-next").click(function(){
+		var pc = $("input.lalg-wf-postcode").val();
+//		console.log(pc);
+		// Always do Member 1
+		$("fieldset.lalg-wf-fs-member1 input.lalg-wf-postcode-clone").val(pc);
+		// Check each Additional Member to see if it exists
+		$("fieldset.lalg-wf-fs-additional-member input.form-text").each(function(index, el) {
+			if ($(this).val()) {
+				$(this).parent().parent().find("input.lalg-wf-postcode-clone").val(pc);
+			};	
+		});	
 	});
 	
 	
