@@ -51,11 +51,19 @@ $(document).ready(function(){
 
 //***************************************************************
 // Default Membership Type Type Required to None on first load
-	console.log(document.referrer);
+//	console.log(document.referrer);
 	if (!document.referrer.includes('admindetails')) { 
 		$("select.lalg-wf-membership-type :nth-child(1)").prop('selected', true);
 	}
 
+//****************************************************************
+// Default Household Name for new Contact	
+	$("input.lalg-wf-lastname").blur(function(){
+		if(!$("input.lalg-wf-hhname").val()) {
+			$("input.lalg-wf-hhname").val($(this).val() + ' Household');
+		}
+	});	
+	
 //****************************************************************
 // Capitalise Postcode fields
 	$("input.lalg-wf-postcode").blur(function(){
