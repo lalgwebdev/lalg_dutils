@@ -42,11 +42,19 @@ $(document).ready(function(){
 		}
 	});
 
+// ************** Not required, no dynamic loading
 // And when existing contact loaded
-	$( document ).ajaxComplete(function( event, request, settings ) {
+//	$( document ).ajaxComplete(function( event, request, settings ) {
 //		console.log("AJAX complete");
-		$("body.node-type-webform input#edit-submitted-membership-details-civicrm-2-contact-1-cg8-custom-18-2").click();
-	});
+//		$("body.node-type-webform input#edit-submitted-membership-details-civicrm-2-contact-1-cg8-custom-18-2").click();
+//	});
+
+//***************************************************************
+// Default Membership Type Type Required to None on first load
+	console.log(document.referrer);
+	if (!document.referrer.includes('admindetails')) { 
+		$("select.lalg-wf-membership-type :nth-child(1)").prop('selected', true);
+	}
 
 //****************************************************************
 // Capitalise Postcode fields
