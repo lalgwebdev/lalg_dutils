@@ -42,13 +42,6 @@ $(document).ready(function(){
 		}
 	});
 
-// ************** Not required, no dynamic loading
-// And when existing contact loaded
-//	$( document ).ajaxComplete(function( event, request, settings ) {
-//		console.log("AJAX complete");
-//		$("body.node-type-webform input#edit-submitted-membership-details-civicrm-2-contact-1-cg8-custom-18-2").click();
-//	});
-
 //***************************************************************
 // Default Membership Type Type Required to None on first load
 //	console.log(document.referrer);
@@ -72,7 +65,7 @@ $(document).ready(function(){
 	});
 	
 //****************************************************************
-// Copy Postcode into clone fields on Contact
+// Copy Postcode into clone fields on Contact when Next Page clicked
 	$(".form-actions input.webform-next").click(function(){
 		var pc = $("input.lalg-wf-postcode").val();
 //		console.log(pc);
@@ -86,8 +79,6 @@ $(document).ready(function(){
 		});	
 	});
 	
-	
-
 });				// End Document Ready
 })(jQuery);		// ******************* Close the $ reversion	
 

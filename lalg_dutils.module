@@ -144,8 +144,6 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
 	$prices .= number_format((float)$values[$newsletterKey]['amount'], 2);
 	if (isset($form['submitted']['membership_details']['#description'])) {
 	  $form['submitted']['membership_details']['#description'] .= $prices;
-	} else {
-	  $form['submitted']['membership_details']['#description'] = $prices;
 	}
   }
 }
