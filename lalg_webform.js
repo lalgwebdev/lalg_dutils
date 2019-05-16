@@ -12,7 +12,7 @@ $(document).ready(function(){
 
 //	Check whether filesets have content when each page loaded
 //	First Page of Webform (Input Fields)
-	$("fieldset.lalg-wf-fs-additional-member input.form-text").each(function(index, el) {
+	$("fieldset.lalg-wf-fs-additional-member input.lalg-wf-lastname").each(function(index, el) {
 //	console.log('Input field found');
 		if ($(this).val()) {
 			$(this).parent().parent().css("display", "block");
@@ -21,7 +21,7 @@ $(document).ready(function(){
 	});
 
 //	Confirmation Page of Webform (Text Fields)
-	$("fieldset.lalg-wf-fs-additional-member .webform-component-display " ).each(function(index, el) {
+	$("fieldset.lalg-wf-fs-additional-member .webform-component-display.lalg-wf-lastname").each(function(index, el) {
 //	console.log('Input field found');
 		var text = $(this).contents().not($(this).children()).text().trim() ;
 //	console.log(text);		
