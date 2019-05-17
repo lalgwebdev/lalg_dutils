@@ -7,7 +7,7 @@
 $(document).ready(function(){
 //	console.log("Webform Loaded");
 	
-//*******************************************************************	
+//************************* ACCORDIONS ******************************************	
 //  Open Additional Household Member filesets on Webforms if they have content.
 
 //	Check whether filesets have content when each page loaded
@@ -31,31 +31,65 @@ $(document).ready(function(){
 		};	
 	});
 	
-//***************************************************************
-// Actions when Membership Type changed
-	$(".lalg-wf-membership-type").change(function(){
-		console.log($(this).val());
-	// Set Email Newsletter Option if Plain Membership selected
-		if($(this).val() == 7) {
-			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9']" ).prop('checked', true);
+//*********************** DEFAULTS ****************************************
+// Actions required on first load of first page
+
+// Actions for End-User Form
+// For the Send Membership Documents field
+	$('.form-radios.lalg-user-wf-senddocs').each(function() {
+		// Hide 'None' if membership mandatory, Else change label and default to None 
+//		console.log('Found Send Docs field');
+		if ($('.form-radios.lalg-wf-membership-type').is(':visible')){
+//			console.log('Membership type is visible');
+			$(this).find('div.form-item:nth-child(3)').hide();
 		}
-	
-	// Set Delivery options if any Membership selected
-		if($(this).val()) {
-			$("input#edit-submitted-membership-details-civicrm-2-contact-1-cg8-custom-18-1").click();
-		} else {
-			$("input#edit-submitted-membership-details-civicrm-2-contact-1-cg8-custom-18-2").click();
-		}
+		else {
+			$(this).parent().find('> label').text('Replacement Membership Document');	
+			$(this).find('div.form-item:nth-child(3) input').click();
+		}	
 	});
 
-//***************************************************************
 // Default Membership Type Type Required to None on first load
 //	console.log(document.referrer);
 	if (!document.referrer.includes('admindetails')) { 
 		$("select.lalg-wf-membership-type :nth-child(1)").prop('selected', true);
 	}
-
+	
+	
+//*************************** DOCUMENT TYPE & DELIVERY ************************************
+// Actions when Membership Type changed
+	$(".lalg-wf-membership-type").change(function(){
+//		console.log($(this).val());
+	// Set Email Newsletter Option if Plain Membership selected
+		if($(this).val() == 7) {
+			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9']" ).prop('checked', true);
+		}
+	
+	// Set Email Delivery if this Contact has Email address, else set By Post
+		// First set all to be by email
+		$('input.lalg-user-wf-senddocs[value="1"]').click();
+		
+		// Contact 1 is a special case - in 'wrong' place on form.  But Email mandatory, so that's OK.	
+		// Additional Members - if no email addresses set By Post
+		$('fieldset.lalg-wf-fs-additional-member input.lalg-user-wf-senddocs[value="2"]').each(function() {
+			email = $(this).parents('.lalg-wf-fs-additional-member').find('input.lalg-wf-email');
+			if (!email.val()) { $(this).click(); }
+		});	
+	});
+	
 //****************************************************************
+// If Email added to Additional Member then set Delivery by Email (on User Form)
+	$('fieldset.lalg-wf-fs-additional-member input.lalg-wf-email').blur( function() {
+//		console.log($(this).val());
+		if ($(this).val()) {
+			$(this).parents('.lalg-wf-fs-additional-member').find('input.lalg-user-wf-senddocs[value="1"]').click();
+		} else {
+			$(this).parents('.lalg-wf-fs-additional-member').find('input.lalg-user-wf-senddocs[value="2"]').click();
+		}
+	});
+
+
+//*********************** OTHERS *****************************************
 // Default Household Name for new Contact	
 	$("input.lalg-wf-lastname").blur(function(){
 		if(!$("input.lalg-wf-hhname").val()) {
