@@ -65,7 +65,7 @@ $(document).ready(function(){
 			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9']" ).prop('checked', true);
 		}
 	
-	// Set Email Delivery if this Contact has Email address, else set By Post
+	// Set Email Delivery if this Contact has Email address, else set By Post - User Form
 		// First set all to be by email
 		$('input.lalg-user-wf-senddocs[value="1"]').click();
 		
@@ -75,6 +75,14 @@ $(document).ready(function(){
 			email = $(this).parents('.lalg-wf-fs-additional-member').find('input.lalg-wf-email');
 			if (!email.val()) { $(this).click(); }
 		});	
+		
+	// Set Email Delivery to By Post if membership selected - Admin Form
+		if ($(this).val()) {
+			$('input.lalg-admin-wf-senddocs[value="2"]').click();
+		}
+		else {
+			$('input.lalg-admin-wf-senddocs[value="3"]').click();
+		}
 	});
 	
 //****************************************************************
