@@ -32,9 +32,15 @@ $(document).ready(function(){
 	});
 	
 //***************************************************************
-// Default Printed Card Required Flag when Membership Type changed
-	$("select.lalg-wf-membership-type").change(function(){
-//		console.log($(this).val());
+// Actions when Membership Type changed
+	$(".lalg-wf-membership-type").change(function(){
+		console.log($(this).val());
+	// Set Email Newsletter Option if Plain Membership selected
+		if($(this).val() == 7) {
+			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9']" ).prop('checked', true);
+		}
+	
+	// Set Delivery options if any Membership selected
 		if($(this).val()) {
 			$("input#edit-submitted-membership-details-civicrm-2-contact-1-cg8-custom-18-1").click();
 		} else {
