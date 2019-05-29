@@ -57,6 +57,7 @@ function lalg_dutils_complete_pay_later_contribution(&$entity, $context) {
 //	entity_save('civicrm_contribution', $contribution_entity);
 }
 
+
 //********************************************************************
 // Custom Webform Validation Rules
 //********************************************************************
@@ -72,7 +73,14 @@ function lalg_dutils_webform_validation_validators() {
       'component_types' => array(
         'textfield', 'email',
       ),
-    )
+    ),
+	'lalg_email_dependencies' => array(
+      'name' => "LALG Email Dependencies",
+      'description' => "Checks dependencies requiring Email field. Select all related fields",
+      'component_types' => array(
+        'email', 'select',
+      ),	 
+	)
   );
 }
 
@@ -82,6 +90,8 @@ function lalg_dutils_webform_validation_validators() {
 function lalg_dutils_webform_validation_validate($validator_name, $items, $components, $rule) {
   if ($items) {
     switch ($validator_name) {
+		
+// ****************  All or None Validator  ***********************		
       case 'all_or_none':
 // dpm($items);	  
         $errors = array();
@@ -95,6 +105,46 @@ function lalg_dutils_webform_validation_validate($validator_name, $items, $compo
 		}
         return $errors;
         break;
+		
+// *********************  Email Dependencies Validator  **************************
+	  case 'lalg_email_dependencies':
+ //dpm($items);
+ //dpm($components);		
+        $errors = array();
+		foreach ($items as $key => $val) {
+			// Pick out the fields of interest
+			switch ($components[$key]['form_key']) {
+				case 'civicrm_1_contact_1_email_email':
+					$email = $key;
+				break;
+				case 'civicrm_2_membership_1_membership_membership_type_id':
+					$membId = $key;
+				break;
+				case 'civicrm_1_contact_1_cg4_custom_29':
+					$sendDocs = $key;
+				break;
+			}
+		}	
+	
+		// Set no error if Email field has some content.
+		if ($components[$email]['value']) {return $errors;}
+			
+		// Email field empty - check dependencies
+		// Plain Membership Required is selected
+		if ($components[$membId]['value'] == 7) {
+			$errors[$email] = 'Plain Membership requires an Email address';
+			return $errors;
+		}
+				
+		// Send documents by Email
+		if ($components[$sendDocs]['value'] == 1) {
+			$errors[$email] = 'Plain Membership requires an Email address';
+			return $errors;
+		}		
+				
+		// No errors		
+        return $errors; 
+		break;
     }
   }
 }
