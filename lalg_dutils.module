@@ -78,7 +78,7 @@ function lalg_dutils_webform_validation_validators() {
       'name' => "LALG Email Dependencies",
       'description' => "Checks dependencies requiring Email field. Select all related fields",
       'component_types' => array(
-        'email', 'select',
+        'textfield', 'email', 'select',
       ),	 
 	)
   );
@@ -107,46 +107,57 @@ function lalg_dutils_webform_validation_validate($validator_name, $items, $compo
         break;
 		
 // *********************  Email Dependencies Validator  **************************
+/* Implements a custom validation rule.
+ * Requires the following fields selected:  Email, Last Name of same Contact, Send Membership Documents, ditto,
+ *   and Membership Type Required.
+ * Error if Email and no Last Name, or Plain Membership and no Email, or Send Docs by Email and no Email.
+ */
 	  case 'lalg_email_dependencies':
- //dpm($items);
- //dpm($components);		
+	  
+ dpm($items);
+ dpm($components);		
         $errors = array();
 		foreach ($items as $key => $val) {
-			// Pick out the fields of interest
-			switch ($components[$key]['form_key']) {
-				case 'civicrm_1_contact_1_email_email':
-					$email = $key;
-				break;
-				case 'civicrm_2_membership_1_membership_membership_type_id':
-					$membId = $key;
-				break;
-				case 'civicrm_1_contact_1_cg4_custom_29':
-					$sendDocs = $key;
-				break;
-			}
+			// Identify the fields of interest
+			$formKey = $components[$key]['form_key'];
+			if (endsWith($formKey, 'email')) {$email = $key;} 
+			if (endsWith($formKey, 'name')) {$name = $key;}
+			if (endsWith($formKey, 'membership_type_id')) {$membId = $key;}
+			if (endsWith($formKey, 'custom_29')) {$sendDocs = $key;}
 		}	
+	dpm ($email . '  Value: ' . $items[$email]);
+	dpm ($name . '  Value: ' . $items[$name]);
+	dpm ($membId . '  Value: ' . $items[$membId]);
+	dpm ($sendDocs . '  Value: ' . $items[$sendDocs]);
 	
-		// Set no error if Email field has some content.
-		if ($components[$email]['value']) {return $errors;}
-			
-		// Email field empty - check dependencies
-		// Plain Membership Required is selected
-		if ($components[$membId]['value'] == 7) {
-			$errors[$email] = 'Plain Membership requires an Email address';
-			return $errors;
+		if ($items[$email] && !$items[$name]) {
+			// Email set but no Name
+			$errors[$name] = 'Name is mandatory if Email field is set';
 		}
-				
-		// Send documents by Email
-		if ($components[$sendDocs]['value'] == 1) {
-			$errors[$email] = 'Plain Membership requires an Email address';
-			return $errors;
-		}		
-				
-		// No errors		
+		else {
+			// Email field empty - check other dependencies	
+			if ($items[$membId] == '7') {
+				$errors[$email] = 'Plain Membership requires an Email address';
+			}			
+			if ($items[$sendDocs] == '1') {
+				$errors[$sendDocs] = 'Send Docs by Email requires an Email address';
+			}			
+		}
+
+		// Return any errors		
         return $errors; 
 		break;
     }
   }
+}
+
+function endsWith($haystack, $needle)
+{
+    $length = strlen($needle);
+    if ($length == 0) {
+        return true;
+    }
+    return (substr($haystack, -$length) === $needle);
 }
 
 //********************************************************************
