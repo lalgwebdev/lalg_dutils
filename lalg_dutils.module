@@ -114,8 +114,8 @@ function lalg_dutils_webform_validation_validate($validator_name, $items, $compo
  */
 	  case 'lalg_email_dependencies':
 	  
- dpm($items);
- dpm($components);		
+// dpm($items);
+// dpm($components);		
         $errors = array();
 		foreach ($items as $key => $val) {
 			// Identify the fields of interest
@@ -125,11 +125,7 @@ function lalg_dutils_webform_validation_validate($validator_name, $items, $compo
 			if (endsWith($formKey, 'membership_type_id')) {$membId = $key;}
 			if (endsWith($formKey, 'custom_29')) {$sendDocs = $key;}
 		}	
-	dpm ($email . '  Value: ' . $items[$email]);
-	dpm ($name . '  Value: ' . $items[$name]);
-	dpm ($membId . '  Value: ' . $items[$membId]);
-	dpm ($sendDocs . '  Value: ' . $items[$sendDocs]);
-	
+
 		if ($items[$email] && !$items[$name]) {
 			// Email set but no Name
 			$errors[$name] = 'Name is mandatory if Email field is set';
