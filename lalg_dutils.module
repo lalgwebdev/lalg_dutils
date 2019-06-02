@@ -126,11 +126,13 @@ function lalg_dutils_webform_validation_validate($validator_name, $items, $compo
 			if (endsWith($formKey, 'custom_29')) {$sendDocs = $key;}
 		}	
 
+ // dpm('Email: ' . $email . 'Value: ' . $items[$email]);
+  
 		if ($items[$email] && !$items[$name]) {
 			// Email set but no Name
 			$errors[$name] = 'Name is mandatory if Email field is set';
 		}
-		else {
+		if (!$items[$email] && $items[$name])  {
 			// Email field empty - check other dependencies	
 			if ($items[$membId] == '7') {
 				$errors[$email] = 'Plain Membership requires an Email address';
