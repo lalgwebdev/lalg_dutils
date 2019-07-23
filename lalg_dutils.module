@@ -199,7 +199,7 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
 	//dpm($form);
 	$prices = 'Membership Prices: </br>' . $values[$plainKey]['label'] . ' -- £';
 	$prices .= number_format((float)$values[$plainKey]['amount'], 2); 
-	$prices .= '.&nbsp;&nbsp;&nbsp;&nbsp;' . $values[$newsletterKey]['label'] . ' -- £';
+	$prices .= '&nbsp;&nbsp;&nbsp;&nbsp;' . $values[$newsletterKey]['label'] . ' -- £';
 	$prices .= number_format((float)$values[$newsletterKey]['amount'], 2);
 	if (isset($form['submitted']['membership_details']['#description'])) {
 	  $form['submitted']['membership_details']['#description'] .= $prices;
@@ -207,5 +207,18 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
   }
 }
 
-
-
+//********************************************************************
+// Changes to User Registration & Profile Forms
+//********************************************************************
+/**
+ * Implements hook_FORM_ID_alter().
+ */
+// function lalg_dutils_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
+	// dpm($form_id);
+// }
+// function lalg_dutils_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+	// dpm($form_id);
+// }
+// function lalg_dutils_form_alter(&$form, &$form_state, $form_id) {
+	// dpm($form_id);
+// }
