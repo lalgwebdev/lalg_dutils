@@ -174,36 +174,61 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
   if ($form['progressbar']['#page_num'] == '1') {	
   //dpm($form);
 	// Find the Price Details
-	$result = civicrm_api3('PriceSet', 'get', [
-		'sequential' => 1,
-		'name' => "Membership_Options_H",
-	]);
-
-	$result = civicrm_api3('PriceField', 'get', [
-		'sequential' => 1,
-		'price_set_id' => $result['values'][0]['id'],
-	]);
-
-	$result = civicrm_api3('PriceFieldValue', 'get', [
-	  'sequential' => 1,
-	  'price_field_id' => $result['values'][0]['id'],
-	]);
-//dpm($result);
-	$values = $result['values'];
-	foreach ($values as $key => $value) {
-		if (stripos($value['name'], 'plain') !== FALSE) $plainKey = $key;
-		if (stripos($value['name'], 'with_news') !== FALSE) $newsletterKey = $key;
-	}
-
-	// Add Prices to the Membership fieldset description field
-	//dpm($form);
-	$prices = 'Membership Prices: </br>' . $values[$plainKey]['label'] . ' -- £';
-	$prices .= number_format((float)$values[$plainKey]['amount'], 2); 
-	$prices .= '&nbsp;&nbsp;&nbsp;&nbsp;' . $values[$newsletterKey]['label'] . ' -- £';
-	$prices .= number_format((float)$values[$newsletterKey]['amount'], 2);
+	$prices = lalg_get_price_data();
+	// Add to form
 	if (isset($form['submitted']['membership_details']['#description'])) {
 	  $form['submitted']['membership_details']['#description'] .= $prices;
 	}
   }
+  
+}
+
+// Extracts and formats the help text containing Membership types and prices
+function lalg_get_price_data() {
+  // Check for cached copy
+  $prices = &drupal_static(__FUNCTION__);
+  if (!isset($prices)) {
+    if ($cache = cache_get('lalg_membership_prices')) {
+      $prices = $cache->data;
+    }
+    else {
+		// Do the hard work, and populate $prices
+	  	// Get the Price Set
+		$result = civicrm_api3('PriceSet', 'get', [
+			'sequential' => 1,
+			'return' => ['id'],
+			'title' => "Membership Options",
+		]);
+		// Get the Price Field
+		$result = civicrm_api3('PriceField', 'get', [
+			'sequential' => 1,
+			'return' => ['id'],
+			'price_set_id' => $result['values'][0]['id'],
+		]);
+		// Get the Membership Options
+		$result = civicrm_api3('PriceFieldValue', 'get', [
+		  'sequential' => 1,
+		  'price_field_id' => $result['values'][0]['id'],
+		]);
+//dpm($result);
+
+		// Build the Help Text
+		$prices = 'Membership Prices: </br>'; 
+		foreach ($result['values'] as $value) {
+//			dpm($value);
+			// Get the Membership Type  - for the Name
+			$result = civicrm_api3('MembershipType', 'get', [
+			  'sequential' => 1,
+			  'return' => ['name'],
+			  'id' => $value['membership_type_id'],
+			]);
+			$prices .= '&nbsp;&nbsp;&nbsp;' . $result['values'][0]['name'] . ' -- £';
+			$prices .= number_format((float)$value['amount'], 2);
+		}
+      // Save back in the cache
+      cache_set('lalg_membership_prices', $prices, 'cache', time() + 7200);		// Actually will be cleared when cron runs - min life two hours
+    }
+  }
+  return $prices;
 }
 
