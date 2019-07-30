@@ -207,18 +207,3 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
   }
 }
 
-//********************************************************************
-// Changes to User Registration & Profile Forms
-//********************************************************************
-/**
- * Implements hook_FORM_ID_alter().
- */
-// function lalg_dutils_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
-	// dpm($form_id);
-// }
-// function lalg_dutils_form_user_register_form_alter(&$form, &$form_state, $form_id) {
-	// dpm($form_id);
-// }
-// function lalg_dutils_form_alter(&$form, &$form_state, $form_id) {
-	// dpm($form_id);
-// }
