@@ -172,7 +172,7 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
   
 //************  Add Membership Price Information  *****************
   if ($form['progressbar']['#page_num'] == '1') {	
-  //dpm($form);
+// dpm($form);
 	// Find the Price Details
 	$prices = lalg_get_price_data();
 	// Add to form
@@ -205,30 +205,19 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
 // ****************** Helper Routine ********************
 // Extracts and formats the help text containing Membership types and prices
 function lalg_get_price_data() {
+//dpm('Get Price Data');
   // Check for cached copy
   $prices = &drupal_static(__FUNCTION__);
   if (!isset($prices)) {
     if ($cache = cache_get('lalg_membership_prices')) {
-      $prices = $cache->data;
+	$prices = $cache->data;
     }
     else {
 		// Do the hard work, and populate $prices
-	  	// Get the Price Set
-		$result = civicrm_api3('PriceSet', 'get', [
-			'sequential' => 1,
-			'return' => ['id'],
-			'title' => "Membership Options",
-		]);
-		// Get the Price Field
-		$result = civicrm_api3('PriceField', 'get', [
-			'sequential' => 1,
-			'return' => ['id'],
-			'price_set_id' => $result['values'][0]['id'],
-		]);
-		// Get the Membership Options
-		$result = civicrm_api3('PriceFieldValue', 'get', [
+		// Get all Active Membership Types
+		$result = civicrm_api3('MembershipType', 'get', [
 		  'sequential' => 1,
-		  'price_field_id' => $result['values'][0]['id'],
+		  'is_active' => 1,
 		]);
 //dpm($result);
 
@@ -236,17 +225,11 @@ function lalg_get_price_data() {
 		$prices = 'Membership Prices: </br>'; 
 		foreach ($result['values'] as $value) {
 //			dpm($value);
-			// Get the Membership Type  - for the Name
-			$result = civicrm_api3('MembershipType', 'get', [
-			  'sequential' => 1,
-			  'return' => ['name'],
-			  'id' => $value['membership_type_id'],
-			]);
-			$prices .= '&nbsp;&nbsp;&nbsp;' . $result['values'][0]['name'] . ' -- £';
-			$prices .= number_format((float)$value['amount'], 2);
+			$prices .= '&nbsp;&nbsp;&nbsp;' . $value['name'] . ' -- £';
+			$prices .= number_format((float)$value['minimum_fee'], 2);
 		}
       // Save back in the cache
-      cache_set('lalg_membership_prices', $prices, 'cache', time() + 7200);		// Actually will be cleared when cron runs - min life two hours
+      cache_set('lalg_membership_prices', $prices, 'cache', time() + 7200);		// Actually will be cleared when cron runs - max life two hours
     }
   }
   return $prices;
