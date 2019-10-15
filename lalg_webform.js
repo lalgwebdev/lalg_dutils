@@ -112,21 +112,6 @@ $(document).ready(function(){
 	  $(this).val( $(this).val().toUpperCase() );
 	});
 	
-//****************************************************************
-// Copy Postcode into clone fields on Contact when Next Page clicked
-// ************** Commented out - Not needed.  Pending deletion  *************
-	// $(".form-actions input.webform-next").click(function(){
-		// var pc = $("input.lalg-wf-postcode").val();
-// //		console.log(pc);
-		// // Always do Member 1
-		// $("fieldset.lalg-wf-fs-member1 input.lalg-wf-postcode-clone").val(pc);
-		// // Check each Additional Member to see if it exists
-		// $("fieldset.lalg-wf-fs-additional-member input.form-text").each(function(index, el) {
-			// if ($(this).val()) {
-				// $(this).parent().parent().find("input.lalg-wf-postcode-clone").val(pc);
-			// };	
-		// });	
-	// }); 
 	
 });				// End Document Ready
 })(jQuery);		// ******************* Close the $ reversion	

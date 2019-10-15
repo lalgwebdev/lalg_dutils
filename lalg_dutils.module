@@ -1,11 +1,11 @@
 <?php
 
 //************************************************************
-// Deals with Autocomplete of Pay Later for admin screens
+// Deals with Autocomplete of Pay Later for admin screen
 //************************************************************
 /**
  * Implements hook_action_info()
- * Creates an Action to Complete a Pay Later Contribution.
+ * Creates a VBO Action to Complete a Pay Later Contribution.
  */
 function lalg_dutils_action_info() {
 	//dpm('Hook Action Info called');
@@ -181,8 +181,28 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
 	}
   }
   
+//********************* Copy Postcode if HH not set yet *************************
+// Usability, if User has registered with Postcode it then shows on Webform.
+  if ($form['progressbar']['#page_num'] == '1' && $form_id == 'webform_client_form_8017')  {	
+//  dpm($form);
+//  dpm($form_id);
+	// Get current Contact Id
+	$cid = CRM_Core_Session::singleton()->getLoggedInContactID();
+//	dpm($cid);
+	// Get their Postcode
+	$result = civicrm_api3('Contact', 'get', [
+	  'sequential' => 1,
+	  'return' => ["postal_code"],
+	  'id' => $cid,
+	]);
+	$postcode = $result['values'][0]['postal_code'];
+//	dpm($postcode);
+	// Set default value for HH Postcode
+	$form['submitted']['civicrm_2_contact_1_fieldset_fieldset']['civicrm_2_contact_1_address_postal_code']['#default_value'] = $postcode;
+  }
 }
 
+// ****************** Helper Routine ********************
 // Extracts and formats the help text containing Membership types and prices
 function lalg_get_price_data() {
   // Check for cached copy
@@ -231,4 +251,5 @@ function lalg_get_price_data() {
   }
   return $prices;
 }
+
 
