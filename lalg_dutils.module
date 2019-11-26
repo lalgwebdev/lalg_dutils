@@ -168,7 +168,9 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
 //dpm($form_id);
 
 //************  Attach Javascript to Webforms for behaviour tweaks. ************
-    $form['#attached']['js'][] = drupal_get_path('module', 'lalg_dutils') . '/lalg_webform.js';
+	$path = drupal_get_path('module', 'lalg_dutils') . '/lalg_webform.js';
+	//dpm($path);
+    $form['#attached']['js'][] = $path;
   
 //************  Add Membership Price Information  *****************
   if ($form['progressbar']['#page_num'] == '1') {	
