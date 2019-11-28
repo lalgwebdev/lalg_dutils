@@ -40,29 +40,38 @@ $(document).ready(function(){
 //		console.log('Setting Type Required = None');
 		$("select.lalg-wf-membership-type :nth-child(1)").prop('selected', true);
 	}
-// Hide 'Membership Requested' Tag, and Label of Print Card Tag
+// Hide 'Membership Requested' & 'Print Card' Tags, and Label of Replacement Request Tag
 	$("div.lalg-wf-tag div:nth-of-type(1)").hide();
-	$("div.lalg-wf-tag div:nth-of-type(2) label").hide();
+	$("div.lalg-wf-tag div:nth-of-type(2)").hide();
+	$("div.lalg-wf-tag div:nth-of-type(3) label").hide();
+	 
+// Set Membership Requested Tag on User Form if Membership Type Required is visible (and mandatory)
+	if ($("div.lalg-wf-membership-type.lalg-wf-user-form").is(':visible') ) {
+		$("div.lalg-wf-tag div:nth-of-type(1) input").prop('checked', true);	
+		$("div.lalg-wf-tag-wrapper").hide();
+	}
 		
 //*************************** DOCUMENT TYPE & DELIVERY ************************************
-// Actions when Membership Type changed
+// Actions when Membership Type changed 
+	//(Admin Form only - User Form has Radios)
 	$("select.lalg-wf-membership-type").change(function(){
 //		console.log($(this).val());
 	// Set Email Newsletter Option if Plain Membership selected
 		if($(this).val() == 7) {
 			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9']" ).prop('checked', true);
 		}
-	// Set 'Membership Requested' Tag if any Membership selected.
+	// Set 'Membership Requested' Tag & Hide all Tags if any Membership selected.
 		if($(this).val()) {
 //			console.log('Set Flag');
 			$("div.lalg-wf-tag div:nth-of-type(1) input").prop('checked', true);
+			$("div.lalg-wf-tag-wrapper").hide();
 		}
 		else {
 			$("div.lalg-wf-tag div:nth-of-type(1) input").prop('checked', false);	
+			$("div.lalg-wf-tag-wrapper").show();
 		}
 	});
-
-
+	
 //*********************** OTHERS *****************************************
 // Default Household Name for new Contact	
 	$("input.lalg-wf-lastname").blur(function(){
