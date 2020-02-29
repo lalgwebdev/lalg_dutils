@@ -169,6 +169,11 @@ function endsWith($haystack, $needle)
  */
 function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
 //dpm($form_id);
+	// Exit unless Page is UserDetails or AdminDetails
+	$uri = $_SERVER['REQUEST_URI'];
+	if (($uri != '/userdetails') && ($uri != '/admindetails')) {
+		return;
+	}
 
 //************  Attach Javascript to Webforms for behaviour tweaks. ************
 	$path = drupal_get_path('module', 'lalg_dutils') . '/lalg_webform.js';
