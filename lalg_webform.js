@@ -41,6 +41,7 @@ $(document).ready(function(){
 		$("select.lalg-wf-membership-type :nth-child(1)").prop('selected', true);
 	}
 // Hide 'Membership Requested' & 'Print Card' Tags, and Label of Replacement Request Tag
+//	console.log('Hiding checkboxes');
 	$("div.lalg-wf-tag div:nth-of-type(1)").hide();
 	$("div.lalg-wf-tag div:nth-of-type(2)").hide();
 	$("div.lalg-wf-tag div:nth-of-type(3) label").hide();

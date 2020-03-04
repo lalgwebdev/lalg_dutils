@@ -171,7 +171,8 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
 //dpm($form_id);
 	// Exit unless Page is UserDetails or AdminDetails
 	$uri = $_SERVER['REQUEST_URI'];
-	if (($uri != '/userdetails') && ($uri != '/admindetails')) {
+	// Check 'Starts With'
+	if ((strpos($uri, '/userdetails') !== 0) && (strpos($uri, '/admindetails') !== 0)){
 		return;
 	}
 
