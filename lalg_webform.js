@@ -54,7 +54,8 @@ $(document).ready(function(){
 		
 //*************************** DOCUMENT TYPE & DELIVERY ************************************
 // Actions when Membership Type changed 
-	//(Admin Form only - User Form has Radios)
+
+//(Admin Form only - User Form has Radios)
 	$("select.lalg-wf-membership-type").change(function(){
 //		console.log($(this).val());
 	// Set Email Newsletter Option if Plain Membership selected
@@ -72,6 +73,16 @@ $(document).ready(function(){
 			$("div.lalg-wf-tag-wrapper").show();
 		}
 	});
+	
+// (User Form)
+	$("input.lalg-wf-membership-type").change(function(){
+//		console.log($(this).val());
+	// Set Email Newsletter Option if Plain Membership selected
+		if(($(this).val() == 7) && ($(this).is(':checked'))) {
+			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9']" ).prop('checked', true);
+		}	
+	});
+
 	
 //*********************** OTHERS *****************************************
 // Default Household Name for new Contact	
