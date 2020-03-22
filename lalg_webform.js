@@ -9,28 +9,53 @@ $(document).ready(function(){
 	
 //************************* ACCORDIONS ******************************************	
 //  Open Additional Household Member filesets on Webforms if they have content.
+//  Runs once on page load.
 
-//	Check whether filesets have content when each page loaded
-//	First Page of Webform (Input Fields)
+//  ****************  All pages of the Webform  ************
+//	Hide all Filesets except the first. (I.e any one that follows another one)
+	$("fieldset.lalg-wf-fs-additional-member + fieldset.lalg-wf-fs-additional-member").hide();
+	
+	// When fileset is expanded manually show the next one
+	$("fieldset.lalg-wf-fs-additional-member a.fieldset-title").click(function(){
+		console.log('Fileset Changed');
+		if (!($(this).parent().parent().parent().hasClass("collapsed"))) {
+			$(this).parent().parent().parent().next("fieldset.lalg-wf-fs-additional-member").show();
+		}
+	});	
+	
+//	*************  First Page of Webform (Input Fields)  ************
+//	Check whether filesets have content
 	$("fieldset.lalg-wf-fs-additional-member input.lalg-wf-lastname").each(function(index, el) {
 //	console.log('Input field found');
 		if ($(this).val()) {
+			// Be sure to unhide it
+			$(this).parent().parent().parent().show();
+			// Expand it
 			$(this).parent().parent().css("display", "block");
 			$(this).parent().parent().parent().removeClass("collapsed");
+			// Show the next one
+			$(this).parent().parent().parent().next("fieldset.lalg-wf-fs-additional-member").show();
 		};	
 	});
 
-//	Confirmation Page of Webform (Text Fields)
+//	*************  Confirmation Page of Webform (Text Fields)  *******************
+//	Check whether filesets have content
 	$("fieldset.lalg-wf-fs-additional-member .webform-component-display.lalg-wf-lastname").each(function(index, el) {
 //	console.log('Input field found');
 		var text = $(this).contents().not($(this).children()).text().trim() ;
 //	console.log(text);		
 		if (text) {
+			// Be sure to unhide it
+			$(this).parent().parent().show();
+			// Expand it
 			$(this).parent().css("display", "block");
 			$(this).parent().parent().removeClass("collapsed");
+			// Show the next one
+			$(this).parent().parent().next("fieldset.lalg-wf-fs-additional-member").show();
 		};	
 	});
-
+	
+	
 //*********************** DEFAULTS ****************************************
 // Actions required on first load of first page
 
