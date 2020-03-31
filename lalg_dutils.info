@@ -1,3 +1,4 @@
 name = LALG Drupal Utilities
 description = Drupal utilities for the CiviCRM system
+package = Custom modules
 core = 7.x

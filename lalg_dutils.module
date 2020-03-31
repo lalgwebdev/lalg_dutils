@@ -233,7 +233,7 @@ function lalg_get_price_data() {
 //dpm($result);
 
 		// Build the Help Text
-		$prices = 'Membership Prices: </br>'; 
+		$prices = '</br>Membership Prices: </br>'; 
 		foreach ($result['values'] as $value) {
 //			dpm($value);
 			$prices .= '&nbsp;&nbsp;&nbsp;' . $value['name'] . ' -- £';
