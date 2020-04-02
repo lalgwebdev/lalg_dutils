@@ -102,10 +102,17 @@ $(document).ready(function(){
 // (User Form)
 	$("input.lalg-wf-membership-type").change(function(){
 //		console.log($(this).val());
+		// Make sure Newsletter flag is enabled
+		$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9'][value=2]" ).prop('disabled', false);
+
 	// Set Email Newsletter Option if Plain Membership selected
 		if(($(this).val() == 7) && ($(this).is(':checked'))) {
-			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9']" ).prop('checked', true);
+			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9'][value=2]" ).prop('checked', true);
 		}	
+	// Remove Email Newsletter option if OTM Selected
+		if(($(this).val() == 9) && ($(this).is(':checked'))) {
+			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9'][value=2]" ).prop('checked', false).prop('disabled', true);
+		}		
 	});
 
 	
@@ -123,6 +130,15 @@ $(document).ready(function(){
 //	   console.log('Postcode blur');
 	  $(this).val( $(this).val().toUpperCase() );
 	});	
+	
+//**********************  Free Membership Only  *************************
+// Hide Payment Method for Zero Total
+	$("tr#wf-crm-billing-total td:nth-child(2)").each(function() {
+		if ($(this).text() == '£ 0.00') {
+			$("div.webform-component--civicrm-1-contribution-1-contribution-payment-processor-id input[value=0]").prop("checked", true);
+			$("div.webform-component--civicrm-1-contribution-1-contribution-payment-processor-id").hide();
+		}
+	});
 
 	
 });				// End Document Ready
