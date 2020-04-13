@@ -246,4 +246,18 @@ function lalg_get_price_data() {
   return $prices;
 }
 
+//********************************************************************
+// Changes to Registration Form
+//********************************************************************
+/**
+ * Implements hook_form_alter().
+ */
+function lalg_dutils_form_user_register_form_alter(&$form, &$form_state, $form_id){
+//dpm($form_id);
+//dpm($form);
 
+//************  Attach Javascript to forms for input validation. ************
+	$path = drupal_get_path('module', 'lalg_dutils') . '/lalg_registerform.js';
+	//dpm($path);
+    $form['#attached']['js'][] = $path;
+}
