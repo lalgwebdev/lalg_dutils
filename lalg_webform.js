@@ -65,16 +65,20 @@ $(document).ready(function(){
 //		console.log('Setting Type Required = None');
 		$("select.lalg-wf-membership-type :nth-child(1)").prop('selected', true);
 	}
-// Hide 'Membership Requested' & 'Print Card' Tags, and Label of Replacement Request Tag
+// Hide Label of Replacement Request Tag
 //	console.log('Hiding checkboxes');
-	$("div.lalg-wf-tag div:nth-of-type(1)").hide();
-	$("div.lalg-wf-tag div:nth-of-type(2)").hide();
-	$("div.lalg-wf-tag div:nth-of-type(3) label").hide();
+	$("div.lalg-wf-replace-tag label").hide();
 	 
 // Set Membership Requested Tag on User Form if Membership Type Required is visible (and mandatory)
 	if ($("div.lalg-wf-membership-type.lalg-wf-user-form").is(':visible') ) {
-		$("div.lalg-wf-tag div:nth-of-type(1) input").prop('checked', true);	
-		$("div.lalg-wf-tag-wrapper").hide();
+		$("div.lalg-wf-process-tag div:nth-of-type(1) input").prop('checked', true);	
+	}
+	
+// Hide Replacement Card Tag if Existing Membership is empty or OTM (Online)
+	$mShip = $('input.lalg-wf-existing-mship').val();
+//	console.log($mShip);
+	if ($mShip.indexOf("Online") >= 0 || $mShip == '') {
+		$("div.lalg-wf-replace-tag-wrapper").hide();
 	}
 		
 //*************************** DOCUMENT TYPE & DELIVERY ************************************
@@ -87,15 +91,13 @@ $(document).ready(function(){
 		if($(this).val() == 7) {
 			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9']" ).prop('checked', true);
 		}
-	// Set 'Membership Requested' Tag & Hide all Tags if any Membership selected.
+	// Set 'Membership Requested' Tag if any Membership selected.
 		if($(this).val()) {
 //			console.log('Set Flag');
-			$("div.lalg-wf-tag div:nth-of-type(1) input").prop('checked', true);
-			$("div.lalg-wf-tag-wrapper").hide();
+			$("div.lalg-wf-process-tag div:nth-of-type(1) input").prop('checked', true);
 		}
 		else {
-			$("div.lalg-wf-tag div:nth-of-type(1) input").prop('checked', false);	
-			$("div.lalg-wf-tag-wrapper").show();
+			$("div.lalg-wf-process-tag div:nth-of-type(1) input").prop('checked', false);	
 		}
 	});
 	
@@ -104,6 +106,8 @@ $(document).ready(function(){
 //		console.log($(this).val());
 		// Make sure Newsletter flag is enabled
 		$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9'][value=2]" ).prop('disabled', false);
+		// Hide Replacement Card tag
+		$("div.lalg-wf-replace-tag-wrapper").hide();
 
 	// Set Email Newsletter Option if Plain Membership selected
 		if(($(this).val() == 7) && ($(this).is(':checked'))) {
