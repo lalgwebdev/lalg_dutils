@@ -247,7 +247,7 @@ function lalg_get_price_data() {
 }
 
 //********************************************************************
-// Changes to Registration Form
+// Changes to Registration Form 
 //********************************************************************
 /**
  * Implements hook_form_alter().
@@ -260,4 +260,23 @@ function lalg_dutils_form_user_register_form_alter(&$form, &$form_state, $form_i
 	$path = drupal_get_path('module', 'lalg_dutils') . '/lalg_registerform.js';
 	//dpm($path);
     $form['#attached']['js'][] = $path;
+}
+
+//********************************************************************
+// Post Processing for Find Mailing Lists View 
+//********************************************************************
+/**
+ * Implements hook_views_post_execute()
+ */
+function lalg_dutils_views_post_execute(&$view) {
+// dpm($view);
+	if ($view->name == 'find_mailing_lists') {
+		foreach ($view->result as $key => $result) {
+			$src = $result->civicrm_group_source;
+			// Show just System Lists - Remove all results with OG Sync source.
+			if (strpos($src, 'OG Sync') !== false) {
+				unset($view->result[$key]);
+			}
+		}
+	}
 }
