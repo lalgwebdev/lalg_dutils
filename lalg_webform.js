@@ -64,18 +64,14 @@ $(document).ready(function(){
 		$("select.lalg-wf-membership-type :nth-child(1)").prop('selected', true);
 	}
 	
-	// Unset and Hide Membership Type Required on User Details form, if Current Member.  (User Form only)
-	//console.log(window.location.pathname);
-	if ( window.location.pathname.indexOf('userdetails') >= 0) {
-		$status = $('input.lalg-wf-membership-status').val();
-		if ( $status.indexOf("Pending") >= 0 || $status.indexOf("New") >= 0 || $status.indexOf("Current") >= 0 ) { 
-			$("input.lalg-wf-membership-type").prop('checked', false);
-			$("div.lalg-wf-membership-type-wrapper").hide();
-		}
-	}
-	
 	// Hide Label of Replacement Request Tag
 	$("div.lalg-wf-replace-tag label").hide();
+
+	// Hide OTM Type Requested on User form unless this is a new joiner.  Only permitted for new joiners
+	if ( $('input.lalg-wf-existing-mship').val() ) {
+		$("div.lalg-wf-membership-type-wrapper div.form-radios > div:nth-of-type(3) ").hide();
+		$("input.lalg-wf-membership-type:nth-of-type(3) ").prop('checked', false);
+	}
 
 // ******************  Call Set State function on first load, and change of Membership Type Required  ********
 	lalg_set_flags();
@@ -87,14 +83,24 @@ $(document).ready(function(){
 	function lalg_set_flags() {
 		
 // ***************************  Get information to work on  ************************
-		$existingType = $('input.lalg-wf-existing-mship').val();		//console.log($existingType);
-		$status = $('input.lalg-wf-membership-status').val();			//console.log($status);
-		$userReq = false;
-		$("input.lalg-wf-membership-type").each(function() {
-			if ($(this).prop('checked')) {$userReq = true;}
-		});																//console.log($userReq);
-		$adminReq = $("select.lalg-wf-membership-type").val();			//console.log($adminReq);
-		$membReq = Boolean( $userReq || $adminReq );					//console.log($membReq);
+		// Existing Membership Type
+		$existingType = $('input.lalg-wf-existing-mship').val();		
+		if (!$existingType) { $existingType = "";}								// Convert 'undefined' into String	
+																				//console.log($existingType);
+		// Existing Membership Status	
+		$status = $('input.lalg-wf-membership-status').val();
+		if (!$status) { $status = "" }											// Convert 'undefined' into String	
+																				//console.log($status);
+		
+		// Membership Type Required is set (Boolean)
+		// Webform Conditionals hide Membership Type Required if it can't be used, else it's mandatory on User form. 
+		// So set Required iff visible.
+		if( $("div.lalg-wf-user-form.lalg-wf-membership-type-wrapper").is(':visible'))  
+			{ $userReq = true; } else { $userReq = false; }						//console.log($userReq);
+		$adminReq = $("select.lalg-wf-membership-type").val();					//console.log($adminReq);
+		$membReq = Boolean( $userReq || $adminReq );							//console.log($membReq);
+		
+		// Replacement Card Requested
 		$replace = false;
 		$('input.lalg-wf-replace-tag').each(function() {
 			if ($(this).prop('checked')) {$replace = true}				// Set if any Replacement Request set
@@ -110,17 +116,21 @@ $(document).ready(function(){
 		}
 		
 // ***************************  Set Replacement Card visibility  *******************
-		// Hide Replacement Card flag, and uncheck it, if:
-		//   Any Membership Type selected, OR 
-		//   Existing Type is Empty, or OTM OR
-		//   Status is Pending, or Lapsed, or Cancelled
-		if ( $membReq || !$existingType || $existingType.indexOf("Online") >= 0 ||
-		   $status.indexOf("Pending") >= 0 || $status.indexOf("Lapsed") >= 0 || $status.indexOf("Cancelled") >= 0 ) { 
-			$("div.lalg-wf-replace-tag-wrapper").hide();
-			$("div.lalg-wf-replace-tag input").prop('checked', false);
-		   }
-		// Else show flag
-		else { $("div.lalg-wf-replace-tag-wrapper").show(); }
+		// Do nothing if on the Preview page
+		$preview = $('form.webform-client-form').hasClass('preview');		//console.log($preview);
+		if (!$preview) {
+			// Hide Replacement Card flags, and uncheck it, if:
+			//   Any Membership Type selected, OR 
+			//   Existing Type is Empty, or OTM OR
+			//   Status is Pending, or Lapsed, or Cancelled
+			if ( $membReq || !$existingType || $existingType.includes("Online") ||
+			   $status.includes("Pending") || $status.includes("Lapsed") || $status.includes("Cancelled") ) { 
+				$("div.lalg-wf-replace-tag-wrapper").hide();
+				$("div.lalg-wf-replace-tag input").prop('checked', false);
+			   }
+			// Else show flag
+			else { $("div.lalg-wf-replace-tag-wrapper").show(); }
+		}
 		
 // ***************************  Set Email Preferences  *******************
 		// Set Newsletter flag, and disable it (to force the state), if Membership Type is Plain Membership
@@ -142,15 +152,15 @@ $(document).ready(function(){
 		});
 		
 		// Do nothing unless a Membership Type has been selected.
-		if ( $membReq == true) {
+		if ( $membReq ) {
 			// If no existing membership then Action => Join
 			if (!$existingType) {
 				$('input.lalg-wf-memact').val(1);
 			}
 			else {
 				// If Membership State Current or Renewable then Action => Renew
-				if ($status.indexOf("New") >= 0 || $status.indexOf("Current") >= 0 || $status.indexOf("Renew") >= 0 || 
-						$status.indexOf("Overdue") >= 0 || $status.indexOf("Pending") >= 0) {
+				if ($status.includes("New") || $status.includes("Current") || $status.includes("Renew") || 
+						$status.includes("Overdue") || $status.includes("Grace") || $status.includes("Pending")) {
 					$('input.lalg-wf-memact').val(2);
 				}
 				// Other Membership status Action => Rejoin
