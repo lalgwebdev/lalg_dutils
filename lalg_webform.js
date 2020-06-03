@@ -68,7 +68,7 @@ $(document).ready(function(){
 	$("div.lalg-wf-replace-tag label").hide();
 
 	// Hide OTM Type Requested on User form unless this is a new joiner.  Only permitted for new joiners
-	if ( $('input.lalg-wf-existing-mship').val() ) {
+	if ( $('input.lalg-wf-membership-status').val() ) {
 		$("div.lalg-wf-membership-type-wrapper div.form-radios > div:nth-of-type(3) ").hide();
 		$("input.lalg-wf-membership-type:nth-of-type(3) ").prop('checked', false);
 	}
