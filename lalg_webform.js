@@ -198,8 +198,16 @@ $(document).ready(function(){
 			$("div.webform-component--civicrm-1-contribution-1-contribution-payment-processor-id").hide();
 		}
 	});
-
 	
+//*********************  Hide Messages about Membership Status  **************
+// Some values (e.g. 'Grace') are deprecated.
+	$("#system-messages-wrapper div.messages").each(function() {
+		var txt = $(this).html();
+		txt = txt.replace(/"Grace"/g, '"Overdue"');
+		txt = txt.replace(/"Expired"/g, '"Lapsed"');
+		$(this).html(txt);	
+	});
+
 });				// End Document Ready
 })(jQuery);		// ******************* Close the $ reversion	
 
