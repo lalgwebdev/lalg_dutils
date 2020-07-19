@@ -31,30 +31,28 @@ function lalg_dutils_complete_pay_later_contribution(&$entity, $context) {
 	
 	if ($context['entity_type'] != 'civicrm_contribution' ) return;
 	if ($entity -> contribution_status != 'Pending' ) return;
-	$cid = $entity -> contribution_id;
-//	dpm($cid);
+	$contribId = $entity -> contribution_id;
+//	dpm($contribId);
 
-// Call the API to trigger the dependent actions - update Membership and send email 
-//	dpm('VBO Completing the Contribution');
-	$result = civicrm_api3('Contribution', 'completetransaction', [
-		'id' => $cid,
-		'total_amount' => $entity -> total_amount,
-		'financial_type' => 2,									// Membership Dues
+// Call the Payment API to trigger the dependent actions - update Membership and send email 
+	$result = civicrm_api3('Payment', 'create', [
+	  'contribution_id' => $contribId,
+	  'total_amount' => $entity -> total_amount,
+	  'trxn_date' => date("Y-m-d h:i:s"),
+	  'is_send_contribution_notification' => 0,
 	]);
-//	dpm($result);
-	
+
 // The system will now save the Drupal Entity which is mirroring the CiviCRM one, 
 //  and thus overwrite changes made via the API.
 //  So update the critical items 'by hand' before this happens.	
-	$contribution_entity = entity_load_single('civicrm_contribution', $cid);
+	$contribution_entity = entity_load_single('civicrm_contribution', $contribId);
 //	dpm($contribution_entity);
 	
 	$contribution_entity -> contribution_status_id = 1;				// Complete
 	$contribution_entity -> contribution_status = 'Complete';		// Belt and Braces
-	$contribution_entity -> payment_instrument_id = 6;				// Not Tracked
+	$contribution_entity -> payment_instrument_id = 6;				// Pay Offline
 	$contribution_entity -> instrument_id = 6;						// Belt and Braces	
-	$contribution_entity -> payment_instrument = 'Not Tracked';		// Belt and Braces
-//	entity_save('civicrm_contribution', $contribution_entity);
+	$contribution_entity -> payment_instrument = 'Pay Offline';		// Belt and Braces
 }
 
 
