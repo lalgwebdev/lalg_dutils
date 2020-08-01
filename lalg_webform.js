@@ -71,6 +71,7 @@ $(document).ready(function(){
 	if ( $('input.lalg-wf-membership-status').val() ) {
 		$("div.lalg-wf-membership-type-wrapper div.form-radios > div:nth-of-type(3) ").hide();
 		$("input.lalg-wf-membership-type:nth-of-type(3) ").prop('checked', false);
+		$("div.lalg-wf-membership-type-wrapper div.description").hide();
 	}
 
 // ******************  Call Set State function on first load, and change of Membership Type Required  ********
