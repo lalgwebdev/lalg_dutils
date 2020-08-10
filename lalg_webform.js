@@ -144,7 +144,8 @@ $(document).ready(function(){
 		}
 
 // ***************************  Set Latest Membership Action  ******************
-		$('input.lalg-wf-memact').val(0);							 
+		// Default to New Joiner.  E.g. when Additional HH member added to existing HH.
+		$('input.lalg-wf-memact').val(1);
 		
 		// If any Replace Tag set then Action => Replace.  Can't be set at same time as Membership Requested
 		// Override later if required.
