@@ -232,6 +232,19 @@ $(document).ready(function(){
 	if (target) {
 		observer.observe(target, {childList: true}); 
 	}
+	
+//***********************  Hide/Show the Wait-Prompt field on the Payment Page  ****************
+// Hide on first loading
+	$("div.webform-component--wait-prompt").hide();
+	
+// Show when Submit button clicked
+	// Check on Payment page
+	if ( $("table#wf-crm-billing-items") ) {
+		$("input.webform-submit").click( function() {
+			$("div.webform-component--wait-prompt").show();
+		});
+	}
+
 
 });				// End Document Ready
 })(jQuery);		// ******************* Close the $ reversion	
