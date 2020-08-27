@@ -209,6 +209,29 @@ $(document).ready(function(){
 		txt = txt.replace(/"Expired"/g, '"Lapsed"');
 		$(this).html(txt);	
 	});
+	
+//********************  Hide/Show the Card-Prompt help field on Payment page
+// Hide on first loading
+	$("div.webform-component--card-prompt").hide();
+	
+// Show/Hide when Billing Block changes
+	// The node to be monitored
+	var target = document.getElementById('billing-payment-block');
+
+	// Create an observer instance
+	var observer = new MutationObserver(function( mutations ) {
+		if ( $("#billing-payment-block").is(':empty') ) {
+			$("div.webform-component--card-prompt").hide();
+		}
+		else {
+			$("div.webform-component--card-prompt").show();		
+		}
+	});
+	 
+	// Pass in the target node, as well as the observer options
+	if (target) {
+		observer.observe(target, {childList: true}); 
+	}
 
 });				// End Document Ready
 })(jQuery);		// ******************* Close the $ reversion	
