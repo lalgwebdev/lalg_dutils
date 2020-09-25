@@ -234,8 +234,11 @@ function lalg_get_price_data() {
 		$prices = '</br>Membership Prices: </br>'; 
 		foreach ($result['values'] as $value) {
 //			dpm($value);
-			$prices .= '&nbsp;&nbsp;&nbsp;' . $value['name'] . ' -- £';
-			$prices .= number_format((float)$value['minimum_fee'], 2);
+			// Exclude OTM, now that it is discontinued
+			if ( strpos($value['name'], 'Online') === false ) {
+				$prices .= '&nbsp;&nbsp;&nbsp;' . $value['name'] . ' -- £';
+				$prices .= number_format((float)$value['minimum_fee'], 2);
+			}	
 		}
       // Save back in the cache
       cache_set('lalg_membership_prices', $prices, 'cache', time() + 7200);		// Actually will be cleared when cron runs - max life two hours
