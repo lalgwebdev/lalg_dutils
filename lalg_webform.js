@@ -186,12 +186,14 @@ $(document).ready(function(){
 	});	
 	
 //****************************************************************
-// Capitalise Postcode fields
+// When Postcode field changes
 	$("input.lalg-wf-postcode").blur(function(){
-//	   console.log('Postcode blur');
+	  // Capitalise it
 	  $(this).val( $(this).val().toUpperCase() );
+	  // And copy to the Dedupe Key field (Admin form only)
+	  $("input.lalg-wf-ddkey").val($(this).val());
 	});	
-	
+
 //**********************  Free Membership Only  *************************
 // Hide Payment Method for Zero Total on Payment page
 	$("tr#wf-crm-billing-total td:nth-child(2)").each(function() {
