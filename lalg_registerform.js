@@ -16,6 +16,9 @@ $(document).ready(function(){
 // *********************  and check valid format     ********************
 	$("input#postal_code-Primary").change(function(){
 		$(this).val($(this).val().toUpperCase());
+		$(this).val($(this).val().trim());
+		$(this).val($(this).val().replace("   ", " "));
+		$(this).val($(this).val().replace("  ", " "));
 		
 		valid = $(this).val().match(/^[A-Z]\d \d[A-Z]{2}$|^[A-Z]\d\d \d[A-Z]{2}$|^[A-Z]{2}\d \d[A-Z]{2}$|^[A-Z]{2}\d\d \d[A-Z]{2}$|^[A-Z]\d[A-Z] \d[A-Z]{2}$|^[A-Z]{2}\d[A-Z] \d[A-Z]{2}$/);
 //		console.log(valid);
