@@ -67,12 +67,12 @@ $(document).ready(function(){
 	// Hide Label of Replacement Request Tag
 	$("div.lalg-wf-replace-tag label").hide();
 
-	// Hide OTM Type Requested on User form unless this is a new joiner.  Only permitted for new joiners
-	if ( $('input.lalg-wf-membership-status').val() ) {
-		$("div.lalg-wf-membership-type-wrapper div.form-radios > div:nth-of-type(3) ").hide();
-		$("input.lalg-wf-membership-type:nth-of-type(3) ").prop('checked', false);
-		$("div.lalg-wf-membership-type-wrapper div.description").hide();
-	}
+	// // Hide OTM Type Requested on User form unless this is a new joiner.  Only permitted for new joiners
+	// if ( $('input.lalg-wf-membership-status').val() ) {
+		// $("div.lalg-wf-membership-type-wrapper div.form-radios > div:nth-of-type(3) ").hide();
+		// $("input.lalg-wf-membership-type:nth-of-type(3) ").prop('checked', false);
+		// $("div.lalg-wf-membership-type-wrapper div.description").hide();
+	// }
 
 // ******************  Call Set State function on first load, and change of Membership Type Required  ********
 	lalg_set_flags();
@@ -188,8 +188,12 @@ $(document).ready(function(){
 //****************************************************************
 // When Postcode field changes
 	$("input.lalg-wf-postcode").blur(function(){
-	  // Capitalise it
-	  $(this).val( $(this).val().toUpperCase() );
+	  // Capitalise it, and remove blank space
+	    $(this).val( $(this).val().toUpperCase() );
+		$(this).val($(this).val().trim());
+		$(this).val($(this).val().replace("   ", " "));
+		$(this).val($(this).val().replace("  ", " "));	  
+	  
 	  // And copy to the Dedupe Key field (Admin form only)
 	  $("input.lalg-wf-ddkey").val($(this).val());
 	});	
