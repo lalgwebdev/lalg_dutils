@@ -1,59 +1,59 @@
 <?php
 
-//************************************************************
-// Deals with Autocomplete of Pay Later for admin screen
-//************************************************************
-/**
- * Implements hook_action_info()
- * Creates a VBO Action to Complete a Pay Later Contribution.
- */
-function lalg_dutils_action_info() {
-	//dpm('Hook Action Info called');
-  return array(
-    'lalg_dutils_complete_pay_later_contribution' => array(
-      'type' => 'entity',
-      'label' => t('Complete payment for a Pending Contribution'),
-      'behavior' => array('changes_property'),
-      'configurable' => FALSE,
-      'vbo_configurable' => FALSE,
-      'triggers' => array('any'),
-    ),
-  );
-}
+// //************************************************************
+// // Deals with Autocomplete of Pay Later for admin screen
+// //************************************************************
+// /**
+ // * Implements hook_action_info()
+ // * Creates a VBO Action to Complete a Pay Later Contribution.
+ // */
+// function lalg_dutils_action_info() {
+	// //dpm('Hook Action Info called');
+  // return array(
+    // 'lalg_dutils_complete_pay_later_contribution' => array(
+      // 'type' => 'entity',
+      // 'label' => t('Complete payment for a Pending Contribution'),
+      // 'behavior' => array('changes_property'),
+      // 'configurable' => FALSE,
+      // 'vbo_configurable' => FALSE,
+      // 'triggers' => array('any'),
+    // ),
+  // );
+// }
 
-/**
- * Carries out the Complete Payment Action
- */
-function lalg_dutils_complete_pay_later_contribution(&$entity, $context) {
-	//dpm('VBO Action');
-//	dpm($entity);
-//	dpm($context);
+// /**
+ // * Carries out the Complete Payment Action
+ // */
+// function lalg_dutils_complete_pay_later_contribution(&$entity, $context) {
+	// //dpm('VBO Action');
+// //	dpm($entity);
+// //	dpm($context);
 	
-	if ($context['entity_type'] != 'civicrm_contribution' ) return;
-	if ($entity -> contribution_status != 'Pending' ) return;
-	$contribId = $entity -> contribution_id;
-//	dpm($contribId);
+	// if ($context['entity_type'] != 'civicrm_contribution' ) return;
+	// if ($entity -> contribution_status != 'Pending' ) return;
+	// $contribId = $entity -> contribution_id;
+// //	dpm($contribId);
 
-// Call the Payment API to trigger the dependent actions - update Membership and send email 
-	$result = civicrm_api3('Payment', 'create', [
-	  'contribution_id' => $contribId,
-	  'total_amount' => $entity -> total_amount,
-	  'trxn_date' => date("Y-m-d h:i:s"),
-	  'is_send_contribution_notification' => 0,
-	]);
+// // Call the Payment API to trigger the dependent actions - update Membership and send email 
+	// $result = civicrm_api3('Payment', 'create', [
+	  // 'contribution_id' => $contribId,
+	  // 'total_amount' => $entity -> total_amount,
+	  // 'trxn_date' => date("Y-m-d h:i:s"),
+	  // 'is_send_contribution_notification' => 0,
+	// ]);
 
-// The system will now save the Drupal Entity which is mirroring the CiviCRM one, 
-//  and thus overwrite changes made via the API.
-//  So update the critical items 'by hand' before this happens.	
-	$contribution_entity = entity_load_single('civicrm_contribution', $contribId);
-//	dpm($contribution_entity);
+// // The system will now save the Drupal Entity which is mirroring the CiviCRM one, 
+// //  and thus overwrite changes made via the API.
+// //  So update the critical items 'by hand' before this happens.	
+	// $contribution_entity = entity_load_single('civicrm_contribution', $contribId);
+// //	dpm($contribution_entity);
 	
-	$contribution_entity -> contribution_status_id = 1;				// Complete
-	$contribution_entity -> contribution_status = 'Complete';		// Belt and Braces
-	$contribution_entity -> payment_instrument_id = 6;				// Pay Offline
-	$contribution_entity -> instrument_id = 6;						// Belt and Braces	
-	$contribution_entity -> payment_instrument = 'Pay Offline';		// Belt and Braces
-}
+	// $contribution_entity -> contribution_status_id = 1;				// Complete
+	// $contribution_entity -> contribution_status = 'Complete';		// Belt and Braces
+	// $contribution_entity -> payment_instrument_id = 6;				// Pay Offline
+	// $contribution_entity -> instrument_id = 6;						// Belt and Braces	
+	// $contribution_entity -> payment_instrument = 'Pay Offline';		// Belt and Braces
+// }
 
 
 //********************************************************************
