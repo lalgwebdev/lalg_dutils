@@ -315,3 +315,19 @@ function lalg_dutils_views_post_execute(&$view) {
 		}
 	}
 }
+
+//********************************************************************
+// Add permission for using STRIPE Test mode 
+//********************************************************************
+/**
+ * Implements hook_permission()
+ */
+function lalg_dutils_permission() {
+  return array(
+    'LALG use Stripe Test mode' => array(
+      'title' => t('LALG use Stripe Test mode'),
+      'description' => t('Use the ?payment=test webform query string.'),
+	  'restrict access' => TRUE,
+    ),
+  );
+}
