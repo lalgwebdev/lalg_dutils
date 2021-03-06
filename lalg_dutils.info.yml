@@ -1,0 +1,8 @@
+name: LALG Drupal Utilities
+type: module
+description: Drupal utilities for the CiviCRM system
+package: Custom
+core_version_requirement: ^8.8 || ^9
+version: 3.0
+
+ 
