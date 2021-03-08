@@ -210,7 +210,8 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
 //************  Attach Javascript to Webforms for behaviour tweaks. ************
 	$path = drupal_get_path('module', 'lalg_dutils') . '/lalg_webform.js';
 	//dpm($path);
-    $form['#attached']['js'][] = $path;
+//##############  Commented out - causes fatal error  ##################
+//    $form['#attached']['js'][] = $path;
   
 //************  Add Membership Price Information  *****************
   if ($form['progressbar']['#page_num'] == '1') {	
@@ -294,7 +295,8 @@ function lalg_dutils_form_user_register_form_alter(&$form, &$form_state, $form_i
 //************  Attach Javascript to forms for input validation. ************
 	$path = drupal_get_path('module', 'lalg_dutils') . '/lalg_registerform.js';
 	//dpm($path);
-    $form['#attached']['js'][] = $path;
+//##############  Commented out - causes fatal error  ##################
+//    $form['#attached']['js'][] = $path;
 }
 
 //********************************************************************
@@ -303,17 +305,18 @@ function lalg_dutils_form_user_register_form_alter(&$form, &$form_state, $form_i
 /**
  * Implements hook_views_post_execute()
  */
-function lalg_dutils_views_post_execute(&$view) {
-// dpm($view);
-	if ($view->name == 'find_mailing_lists') {
-		foreach ($view->result as $key => $result) {
-			$src = $result->civicrm_group_source;
-			// Show just System Lists - Remove all results with OG Sync source.
-			if (strpos($src, 'OG Sync') !== false) {
-				unset($view->result[$key]);
-			}
-		}
-	}
-}
+// Throws error.  View does not exist?? ##############################
+// function lalg_dutils_views_post_execute(&$view) {										
+// // dpm($view);
+	// if ($view->name == 'find_mailing_lists') {
+		// foreach ($view->result as $key => $result) {
+			// $src = $result->civicrm_group_source;
+			// // Show just System Lists - Remove all results with OG Sync source.
+			// if (strpos($src, 'OG Sync') !== false) {
+				// unset($view->result[$key]);
+			// }
+		// }
+	// }
+// }
 
 
