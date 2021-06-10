@@ -1,60 +1,93 @@
 <?php
 
-// //************************************************************
-// // Deals with Autocomplete of Pay Later for admin screen
-// //************************************************************
-// /**
- // * Implements hook_action_info()
- // * Creates a VBO Action to Complete a Pay Later Contribution.
- // */
-// function lalg_dutils_action_info() {
-	// //dpm('Hook Action Info called');
-  // return array(
-    // 'lalg_dutils_complete_pay_later_contribution' => array(
-      // 'type' => 'entity',
-      // 'label' => t('Complete payment for a Pending Contribution'),
-      // 'behavior' => array('changes_property'),
-      // 'configurable' => FALSE,
-      // 'vbo_configurable' => FALSE,
-      // 'triggers' => array('any'),
-    // ),
-  // );
-// }
+//************************************************************
+// Creates VBO Action to delete all personal data
+//************************************************************
+/**
+ * Implements hook_action_info()
+ * Creates a VBO Action to delete a Contact and all personal data.
+ */
+function lalg_dutils_action_info() {
+//	dpm('Hook Action Info called');
+  return array(
+      'lalg_dutils_delete_personal_data' => array(
+      'type' => 'entity',
+      'label' => t('Delete Contacts and all personal data'),
+      'behavior' => array(''),
+      'configurable' => FALSE,
+      'vbo_configurable' => FALSE,
+      'triggers' => array('civicrm_contact'),
+    ),
+  );
+}
 
-// /**
- // * Carries out the Complete Payment Action
- // */
-// function lalg_dutils_complete_pay_later_contribution(&$entity, $context) {
-	// //dpm('VBO Action');
-// //	dpm($entity);
-// //	dpm($context);
+/**
+ * Carries out the VBO Action to delete all personal data.
+ */
+function lalg_dutils_delete_personal_data (&$entity, $context) {
+	// dpm('VBO Action');
+	// dpm($entity);
+	// dpm($context);	
 	
-	// if ($context['entity_type'] != 'civicrm_contribution' ) return;
-	// if ($entity -> contribution_status != 'Pending' ) return;
-	// $contribId = $entity -> contribution_id;
-// //	dpm($contribId);
+	// Get the Contact Id.
+	if ($context['entity_type'] != 'civicrm_contact' ) return;
+	$cid = $entity -> contact_id;
+// dpm('Contact_id ' . $cid);
 
-// // Call the Payment API to trigger the dependent actions - update Membership and send email 
-	// $result = civicrm_api3('Payment', 'create', [
-	  // 'contribution_id' => $contribId,
-	  // 'total_amount' => $entity -> total_amount,
-	  // 'trxn_date' => date("Y-m-d h:i:s"),
-	  // 'is_send_contribution_notification' => 0,
-	// ]);
+	//Get the Drupal User ID
+	$result = civicrm_api3('User', 'get', [
+	  'contact_id' => $cid,
+	]);
+	$uid = $result['id'];
+// dpm('Drupal User Id ' . $uid);
 
-// // The system will now save the Drupal Entity which is mirroring the CiviCRM one, 
-// //  and thus overwrite changes made via the API.
-// //  So update the critical items 'by hand' before this happens.	
-	// $contribution_entity = entity_load_single('civicrm_contribution', $contribId);
-// //	dpm($contribution_entity);
+	// Delete related Activities
+	$result = civicrm_api3('Activity', 'get', [
+	  'sequential' => 1,
+	  'contact_id' => $cid,
+	  'options' => array(
+		'limit' => 1000,
+		'sort' => "id DESC"
+	  ),
+	]);
+	foreach ($result['values'] as $activity) {
+		$r = civicrm_api3('Activity', 'delete', [
+		  'id' => $activity['id'],
+		  'skip_undelete' => 1,
+		]);
+	}
 	
-	// $contribution_entity -> contribution_status_id = 1;				// Complete
-	// $contribution_entity -> contribution_status = 'Complete';		// Belt and Braces
-	// $contribution_entity -> payment_instrument_id = 6;				// Pay Offline
-	// $contribution_entity -> instrument_id = 6;						// Belt and Braces	
-	// $contribution_entity -> payment_instrument = 'Pay Offline';		// Belt and Braces
-// }
-
+	// Delete related Contributions
+	$result = civicrm_api3('Contribution', 'get', [
+	  'sequential' => 1,
+	  'contact_id' => $cid,
+	]);
+	foreach ($result['values'] as $contrib) {
+		$r = civicrm_api3('Contribution', 'delete', [
+		  'id' => $contrib['id'],
+		  'skip_undelete' => 1,
+		]);
+	}
+	
+	// Delete the Contact record
+	// Flows down to associated Membership, membership of Groups.
+	$result = civicrm_api3('Contact', 'delete', [
+	  'id' => $cid,
+	  'skip_undelete' => 1,
+	]);
+	
+	// Delete associated Drupal User, Reassign content to Anonymous
+	if ($uid && $uid > 0) {
+		user_cancel(
+		  array(
+			'user_cancel_notify' => FALSE,
+			'user_cancel_method' => 'user_cancel_reassign',
+		  ),
+		  $uid,
+		  'user_cancel_reassign'
+		);
+	}
+}
 
 //********************************************************************
 // Custom Webform Validation Rules
@@ -308,4 +341,20 @@ function lalg_dutils_views_post_execute(&$view) {
 			}
 		}
 	}
+}
+
+//********************************************************************
+// Add permission for using STRIPE Test mode 
+//********************************************************************
+/**
+ * Implements hook_permission()
+ */
+function lalg_dutils_permission() {
+  return array(
+    'LALG use Stripe Test mode' => array(
+      'title' => t('LALG use Stripe Test mode'),
+      'description' => t('Use the ?payment=test webform query string.'),
+	  'restrict access' => TRUE,
+    ),
+  );
 }
