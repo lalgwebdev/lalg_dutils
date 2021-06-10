@@ -78,6 +78,13 @@ function lalg_dutils_webform_validation_validators() {
       'component_types' => array(
         'textfield', 'email', 'select',
       ),	 
+	),
+	'lalg_unique_or_empty' => array(
+	  'name' => 'LALG Unique or Empty',
+	  'description' => 'Selected fields cannot be duplicates, unless they are empty.  Case insensitive.',
+      'component_types' => array(
+        'textfield', 'email', 
+      ),
 	)
   );
 }
@@ -146,6 +153,26 @@ function lalg_dutils_webform_validation_validate($validator_name, $items, $compo
 		// Return any errors		
         return $errors; 
 		break;
+		
+	  // ****************  Unique or Empty Validator  ***********************		
+      case 'lalg_unique_or_empty':
+
+        $errors = array();
+  
+		// Count how many times each value appears, and find out which
+		// values appear more than once.
+		$items_count = array_count_values(array_map('drupal_strtolower', array_map('trim', $items)));
+        $doubles = array_filter($items_count, function ($x) {
+          return $x > 1;
+        });
+        foreach ($items as $key => $val) {
+          if (isset($val) && !empty($val) && in_array(drupal_strtolower($val), array_keys($doubles))) {
+            $errors[$key] = t('%item address %value must not be duplicated.', array('%item' => $components[$key]['name'], '%value' => $val));
+          }
+        }
+
+        return $errors;
+        break;
     }
   }
 }
