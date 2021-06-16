@@ -233,6 +233,7 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
 	if ((strpos($uri, '/userdetails') !== 0) && (strpos($uri, '/admindetails') !== 0)){
 		return;
 	}
+//+d($form);
 
 //************  Attach Javascript to Webforms for behaviour tweaks. ************
 	$path = drupal_get_path('module', 'lalg_dutils') . '/lalg_webform.js';
@@ -270,6 +271,26 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
 	// Set default value for HH Postcode
 	$form['submitted']['civicrm_2_contact_1_fieldset_fieldset']['civicrm_2_contact_1_address_postal_code']['#default_value'] = $postcode;
   }
+  
+//********************  Set Test version of the Payment Processor for WatirUser  *******************//
+//  Allows regression tests on live system without reconfiguration.
+//  On User Details form only
+
+	if ((strpos($uri, '/userdetails') == 0) && (strtolower($GLOBALS['user']->name) == 'watiruser')) {
+		$ppid = (int)$form['#node']->webform_civicrm['data']['contribution'][1]['contribution'][1]['payment_processor_id'];
+		// If Id is odd then it is the Live version, so add one to get to test version
+		if ($ppid % 2 != 0) {
+			$form['#node']->webform_civicrm['data']['contribution'][1]['contribution'][1]['payment_processor_id'] = (string)($ppid + 1);
+		}
+		
+		$ppid = (int)$form['progressbar']['#node']->webform_civicrm['data']['contribution'][1]['contribution'][1]['payment_processor_id'];
+		// If Id is odd then it is the Live version, so add one to get to test version
+		if ($ppid % 2 != 0) {
+			$form['progressbar']['#node']->webform_civicrm['data']['contribution'][1]['contribution'][1]['payment_processor_id'] = (string)($ppid + 1);
+		}
+//+d($form);		
+	}
+ 
 }
 
 // ****************** Helper Routine ********************
@@ -316,8 +337,6 @@ function lalg_get_price_data() {
  * Implements hook_form_alter().
  */
 function lalg_dutils_form_user_register_form_alter(&$form, &$form_state, $form_id){
-//dpm($form_id);
-//dpm($form);
 
 //************  Attach Javascript to forms for input validation. ************
 	$path = drupal_get_path('module', 'lalg_dutils') . '/lalg_registerform.js';
