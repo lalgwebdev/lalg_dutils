@@ -67,13 +67,6 @@ $(document).ready(function(){
 	// Hide Label of Replacement Request Tag
 	$("div.lalg-wf-replace-tag label").hide();
 
-	// // Hide OTM Type Requested on User form unless this is a new joiner.  Only permitted for new joiners
-	// if ( $('input.lalg-wf-membership-status').val() ) {
-		// $("div.lalg-wf-membership-type-wrapper div.form-radios > div:nth-of-type(3) ").hide();
-		// $("input.lalg-wf-membership-type:nth-of-type(3) ").prop('checked', false);
-		// $("div.lalg-wf-membership-type-wrapper div.description").hide();
-	// }
-
 // ******************  Call Set State function on first load, and change of Membership Type Required  ********
 	lalg_set_flags();
 	$("select.lalg-wf-membership-type").change(function(){ lalg_set_flags(); });
@@ -84,23 +77,37 @@ $(document).ready(function(){
 	function lalg_set_flags() {
 		
 // ***************************  Get information to work on  ************************
+		// Admin or User form
+		$isUserForm = $("div.lalg-wf-membership-type").hasClass("lalg-wf-user-form");
+//console.log($isUserForm);
+		
 		// Existing Membership Type
 		$existingType = $('input.lalg-wf-existing-mship').val();		
-		if (!$existingType) { $existingType = "";}								// Convert 'undefined' into String	
-																				//console.log($existingType);
+		if (!$existingType) { $existingType = "";}				// Convert 'undefined' to String	
+//console.log($existingType);
+
 		// Existing Membership Status	
 		$status = $('input.lalg-wf-membership-status').val();
-		if (!$status) { $status = "" }											// Convert 'undefined' into String	
-																				//console.log($status);
+		if (!$status) { $status = "" }							// Convert 'undefined' to String	
+//console.log($status);
 		
-		// Membership Type Required is set (Boolean)
+		// Membership Type Required.  Id Number, or zero if none. 
 		// Webform Conditionals hide Membership Type Required if it can't be used, else it's mandatory on User form. 
-		// So set Required iff visible.
-		if( $("div.lalg-wf-user-form.lalg-wf-membership-type-wrapper").is(':visible'))  
-			{ $userReq = true; } else { $userReq = false; }						//console.log($userReq);
-		$adminReq = $("select.lalg-wf-membership-type").val();					//console.log($adminReq);
-		$membReq = Boolean( $userReq || $adminReq );							//console.log($membReq);
-		
+		$typeVis = $("div.lalg-wf-user-form.lalg-wf-membership-type-wrapper").is(':visible');
+			
+		// Get the selected new membership type.
+		if ($isUserForm) {
+			if ($typeVis) {
+				$reqType = $("div.lalg-wf-membership-type input:checked").val();
+			}
+			else $reqType = 0;
+		}
+		else {
+			$reqType = $("select.lalg-wf-membership-type").val();
+		}
+		if (!$reqType) { $reqType = 0; }
+//console.log($reqType);		
+			
 		// Replacement Card Requested
 		$replace = false;
 		$('input.lalg-wf-replace-tag').each(function() {
@@ -109,7 +116,7 @@ $(document).ready(function(){
 		
 // ***************************  Set Membership Requested  *******************
 		// Set Membership Requested flag if any Membership Type set.  Else clear flag.
-		if( $membReq ) {
+		if( $reqType ) {
 			$("div.lalg-wf-process-tag div:nth-of-type(1) input").prop('checked', true);
 		}
 		else {
@@ -124,7 +131,7 @@ $(document).ready(function(){
 			//   Any Membership Type selected, OR 
 			//   Existing Type is Empty, or OTM OR
 			//   Status is Pending, or Lapsed, or Cancelled
-			if ( $membReq || !$existingType || $existingType.includes("Online") ||
+			if ( $reqType || !$existingType || $existingType.includes("Online") ||
 			   $status.includes("Pending") || $status.includes("Lapsed") || $status.includes("Cancelled") ) { 
 				$("div.lalg-wf-replace-tag-wrapper").hide();
 				$("div.lalg-wf-replace-tag input").prop('checked', false);
@@ -134,14 +141,14 @@ $(document).ready(function(){
 		}
 		
 // ***************************  Set Email Preferences  *******************
-		// Set Newsletter flag, and disable it (to force the state), if Membership Type is Plain Membership
-		if ($userReq == 7 || $adminReq == 7) {
-			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9'][value=2]" ).prop('checked', true).prop('disabled', true);
+		// Set Information Emails flag if joining for the first time, or after lapsing.
+		if ( $reqType && ( !$existingType || $status.includes("Lapsed") )) {
+			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9'][value=1]" ).prop('checked', true);
 		}
-		// Else just Enable Newsletter flag
-		else {
-			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9'][value=2]" ).prop('disabled', false);
-		}
+		// Set Newsletter Emails if Joining with plain Membership for first time, after lapsing, or changing membership type.
+		if ($reqType == 7 && (!$existingType || $status.includes("Lapsed") || $existingType.includes("Printed"))) {
+			$("input.lalg-wf-emailoptions[data-civicrm-field-key$='contact_1_cg4_custom_9'][value=2]" ).prop('checked', true);
+		}		
 
 // ***************************  Set Latest Membership Action  ******************
 		// Default to New Joiner.  E.g. when Additional HH member added to existing HH.
@@ -154,7 +161,7 @@ $(document).ready(function(){
 		});
 		
 		// Do nothing unless a Membership Type has been selected.
-		if ( $membReq ) {
+		if ( $reqType ) {
 			// If no existing membership then Action => Join
 			if (!$existingType) {
 				$('input.lalg-wf-memact').val(1);
@@ -173,8 +180,6 @@ $(document).ready(function(){
 		}
 //		console.log("Membership Action = " + $('input.lalg-wf-memact').val());	
 	}
-	
-
 	
 	
 //*********************** VARIOUS OTHERS *****************************************
