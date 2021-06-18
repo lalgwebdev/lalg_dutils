@@ -1,5 +1,0 @@
-'LALG use Stripe Test mode':
-  title: 'LALG use Stripe Test mode'
-  description: 'Use the ?payment=test webform query string.'
-  restrict access: true
-  
