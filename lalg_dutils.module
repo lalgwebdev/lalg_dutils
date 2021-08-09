@@ -176,12 +176,12 @@ function lalg_dutils_webform_validation_validate($validator_name, $items, $compo
 			// Email set but no Name
 			$errors[$name] = 'Name is mandatory if Email field is set';
 		}
-		if (!$items[$email] && $items[$name])  {
-			// Email field empty - check other dependencies	
-			if ($items[$membId] == '7') {
-				$errors[$email] = 'Membership without a Printed Newsletter requires an Email address';
-			}			
-		}
+		// if (!$items[$email] && $items[$name])  {
+			// // Email field empty - check other dependencies	
+			// if ($items[$membId] == '7') {
+				// $errors[$email] = 'Membership without a Printed Newsletter requires an Email address';
+			// }			
+		// }
 
 		// Return any errors		
         return $errors; 
