@@ -233,6 +233,9 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
 	if ((strpos($uri, '/userdetails') !== 0) && (strpos($uri, '/admindetails') !== 0)){
 		return;
 	}
+	
+	// Install Kint library 
+	require 'kint.phar';
 //+d($form);
 
 //************  Attach Javascript to Webforms for behaviour tweaks. ************
