@@ -203,6 +203,14 @@ $(document).ready(function(){
 	  $("input.lalg-wf-ddkey").val($(this).val());
 	});	
 
+//**********************************************************************
+// Copy Email to Billing Email, when set
+	if (!($("div.lalg-wf-membership-type").hasClass("lalg-wf-user-form"))) {
+		$("input.lalg-wf-email").blur(function(){
+			$("input.lalg-wf-billing-email").val($(this).val());
+		});
+	}
+
 //**********************  Free Membership Only  *************************
 // Hide Payment Method for Zero Total on Payment page
 	$("tr#wf-crm-billing-total td:nth-child(2)").each(function() {
