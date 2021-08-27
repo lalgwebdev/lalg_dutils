@@ -277,19 +277,33 @@ function lalg_dutils_form_webform_client_form_alter(&$form, &$form_state, $form_
 //********************  Add Test version of the Payment Processor for WatirUser (etc.) *******************//
 //  Allows regression tests on live system without reconfiguration.
 
-	$uname = $GLOBALS['user']->name;
+	$uname = strtolower($GLOBALS['user']->name);
 	if ($uname == 'watiruser' || $uname == 'watir' || $uname == 'tony') {
 		
-//+d($form);
-		$ppid =& $form['submitted']['civicrm_1_contribution_1_contribution_payment_processor_id'];
-		//Add the Stripe Test PP as additional option.
-		if (!isset($ppid['#options'][9])) {
-			$ppid['#options'][9] = 'STRIPE Test';
+// +d($form);
+
+		if (isset($form['submitted']['civicrm_1_contribution_1_contribution_payment_processor_id'])) {		
+		// Admin form where there are multiple PP options
+			$ppid =& $form['submitted']['civicrm_1_contribution_1_contribution_payment_processor_id'];
+			//Add the Stripe Test PP as additional option.
+			if (!isset($ppid['#options'][9])) {
+				$ppid['#options'][9] = 'STRIPE Test';
+			}
+			if (strpos($ppid['#webform_component']['extra']['items'], '9|') === false) {
+				$ppid['#webform_component']['extra']['items'] = $ppid['#webform_component']['extra']['items'] . ' 9|STRIPE Test';
+			}	
 		}
-		if (strpos($ppid['#webform_component']['extra']['items'], '9|') === false) {
-			$ppid['#webform_component']['extra']['items'] = $ppid['#webform_component']['extra']['items'] . ' 9|STRIPE Test';
-		}	
-//+d($form);		
+
+		// User form where there is only a single PP
+		$ppid = (int)$form['progressbar']['#node']->webform_civicrm['data']['contribution'][1]['contribution'][1]['payment_processor_id'];
+// dpm($ppid);			
+		if ($ppid > 0) {
+			// If Id is odd then it is the Live version, so add one to get to test version
+			if ($ppid % 2 != 0) {
+				$form['progressbar']['#node']->webform_civicrm['data']['contribution'][1]['contribution'][1]['payment_processor_id'] = (string)($ppid + 1);
+			}
+		}
+// +d($form);		
 	}
  
 }
