@@ -6,6 +6,10 @@
 
 $(document).ready(function(){
 //	console.log("Webform Loaded");
+
+	// Admin or User form
+	$isUserForm = $("div.lalg-wf-membership-type").hasClass("lalg-wf-user-form");
+//console.log($isUserForm);
 	
 //************************* ACCORDIONS ******************************************	
 //  Open Additional Household Member filesets on Webforms if they have content.
@@ -181,6 +185,33 @@ $(document).ready(function(){
 //		console.log("Membership Action = " + $('input.lalg-wf-memact').val());	
 	}
 	
+//**************************  Set Billing Email, on Admin Screen  ***********************
+//  Set default on page load, or when membership type changes, or copy from Home Email
+	if (!$isUserForm) {
+		// Set default on page load, if required. (Should always default blank anyway.)
+		setDefaultBillingEmail();
+		
+		// Set default when membership type changes, if required
+		$("select.lalg-wf-membership-type").change(function(){
+			setDefaultBillingEmail(); 
+		});
+		
+		// Set default when Home Email changes, if required 
+		$("input.lalg-wf-email").blur(function(){
+			setDefaultBillingEmail();
+		});
+	}
+	
+	function setDefaultBillingEmail() {
+		// If Membership Type is set and Home Email is blank
+		if ($("select.lalg-wf-membership-type").val() && !$("input.lalg-wf-email").val()) {
+			$("input.lalg-wf-billing-email").val('membership@lalg.org.uk');			
+		}
+		else {
+			$("input.lalg-wf-billing-email").val('');
+		}
+	}
+	
 	
 //*********************** VARIOUS OTHERS *****************************************
 // Default Household Name for new Contact	
@@ -202,14 +233,6 @@ $(document).ready(function(){
 	  // And copy to the Dedupe Key field (Admin form only)
 	  $("input.lalg-wf-ddkey").val($(this).val());
 	});	
-
-//**********************************************************************
-// Copy Email to Billing Email, when set
-	if (!($("div.lalg-wf-membership-type").hasClass("lalg-wf-user-form"))) {
-		$("input.lalg-wf-email").blur(function(){
-			$("input.lalg-wf-billing-email").val($(this).val());
-		});
-	}
 
 //**********************  Free Membership Only  *************************
 // Hide Payment Method for Zero Total on Payment page
